@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class SignInActivity extends AppCompatActivity {
     @Bind(R.id.submitSignIn) Button mSubmitSignIn;
@@ -19,6 +20,7 @@ public class SignInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+        ButterKnife.bind(this);
 
         mSubmitSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
