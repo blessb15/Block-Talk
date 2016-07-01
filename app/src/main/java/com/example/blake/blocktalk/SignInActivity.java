@@ -29,7 +29,6 @@ public class SignInActivity extends AppCompatActivity {
                 String password = mPasswordSignIn.getText().toString();
                 Intent intent = new Intent(SignInActivity.this, UserActivity.class);
                 intent.putExtra("username", username);
-                intent.putExtra("password", password);
                 startActivity(intent);
             }
         });

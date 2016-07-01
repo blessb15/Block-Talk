@@ -17,7 +17,8 @@
         android:layout_marginBottom="67dp"
         android:layout_above="@+id/passwordSignIn"
         android:layout_alignLeft="@+id/submitSignIn"
-        android:layout_alignStart="@+id/submitSignIn" />
+        android:layout_alignStart="@+id/submitSignIn"
+        android:textAlignment="center" />
 
     <EditText
         android:layout_width="wrap_content"
