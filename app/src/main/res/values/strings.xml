@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">BlockTalk</string>
+    <string name="title_activity_user">Map</string>
 </resources>
