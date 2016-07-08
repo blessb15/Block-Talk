@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.Button;
 
 
+import com.example.blake.blocktalk.SignUpActivity;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
