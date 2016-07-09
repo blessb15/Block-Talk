@@ -98,7 +98,7 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 messages.add(userMessage);
                 mMessages.put(userLocation, messages);
                 System.out.println("this is the users location =" + userLocation);
-                System.out.println("this is the users message =" + mUserMessage);
+                System.out.println("this is the HashMap =" + mMessages);
                 System.out.println("this is the users messageArray =" + messages);
             }
         });
@@ -114,8 +114,8 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<String> getMessageLocation() {
         ArrayList<String> messagesInUserLocation = new ArrayList<String>();
         for (Map.Entry<LatLng, ArrayList<String>> entry : mMessages.entrySet()) {
-            ///THIS IS A CHECK TO SEE IF USER IS WITHIN A CERTAIN DISTANCE OF VIEWABLE MESSAGES
-            if (entry.getKey().latitude + radius == userLocation.latitude && entry.getKey().longitude + radius == userLocation.longitude) {
+            ///THIS IS A CHECK TO SEE IF USER IS WITHIN A CERTAIN DISTANCE OF VIEWABLE MESSAGES  --------FINISH THIS!!!!!!!!! JUST DO LONGITUDE BRUH!!!!!!------
+            if (entry.getKey().latitude + radius > userLocation.latitude && userLocation.latitude < entry.getKey().latitude + radius && entry.getKey().longitude + radius > userLocation.longitude) {
                 ///IF YOU'RE AT A LOCATION WITH MESSAGES IT GRABS ALL THE MESSAGES
                 for (int i = 0; i < entry.getValue().size(); i++) {
                     String message = (entry.getValue().get(i));
