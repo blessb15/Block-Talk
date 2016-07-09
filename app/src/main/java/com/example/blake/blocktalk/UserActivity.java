@@ -10,7 +10,6 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,8 +19,6 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import android.support.v4.app.FragmentActivity;
-import android.widget.Toast;
-
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -42,8 +39,8 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     @Bind(R.id.SubmitLocalMessage)
     Button mSubmitLocalMessage;
     ///mMessages is what stores location and messages in that location.
-    ArrayList<String> messages = new ArrayList<String>();
-    Map <LatLng, ArrayList<String>> mMessages = new HashMap<LatLng, ArrayList<String>>();
+    ArrayList<String> newMessages = new ArrayList<String>();
+    Map <LatLng, ArrayList<String>> mLocationMessages = new HashMap<LatLng, ArrayList<String>>();
     private GoogleMap mMap;
     LocationManager locationManager;
     Double userLong;
@@ -66,11 +63,8 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
         String username = intent.getStringExtra("username");
         String newMessage = intent.getStringExtra("message");
         mGetUser.setText("Hey, " + username + "!");
-        //THIS IS WHERE YOU PUT THE MESSAGES TO BE SHOWN IN THE LIST.
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, getMessageLocation());
-        mMessagesView.setAdapter(adapter);
 
-        ////////FIND USER LOCATION WITH PERMISSIONS//////////
+        ///FIND USER LOCATION WITH PERMISSIONS
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -79,6 +73,7 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
         criteria.setCostAllowed(true);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
 
+        ///sets refresh of user location.
         String provider = locationManager.getBestProvider(criteria, true);
         if (provider != null) {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -90,40 +85,39 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
             }
             locationManager.requestLocationUpdates(provider, 1000, 0, listener);
         }
-        //LOCAL MESSAGE SUBMIT
+
+        ///LOCAL MESSAGE SUBMIT
         mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String userMessage = mUserMessage.getText().toString();
-                messages.add(userMessage);
-                mMessages.put(userLocation, messages);
-                System.out.println("this is the users location =" + userLocation);
-                System.out.println("this is the HashMap =" + mMessages);
-                System.out.println("this is the users messageArray =" + messages);
+                newMessages.add(userMessage);
+
+                //if there are no hashes
+                if (mLocationMessages.size() == 0) {
+                    mLocationMessages.put(userLocation, newMessages);
+                }
+
+                //if there are hashes
+                if (mLocationMessages.size() >= 1) {
+                    for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
+                        //checks if there is already hash within radius location, if so it just adds a message to it.
+                        if (entry.getKey().latitude + radius > Math.abs(userLocation.latitude) && Math.abs(userLocation.latitude) < entry.getKey().latitude - radius && entry.getKey().longitude + radius > Math.abs(userLocation.longitude) && Math.abs(userLocation.longitude) < entry.getKey().longitude - radius) {
+                            entry.getValue().add(userMessage);
+                            //if users location is not within radius of a hash in hashmap, it creates new hash with message.
+                        } else {
+                            mLocationMessages.put(userLocation, newMessages);
+                            System.out.println("this is messages in your location = " + entry.getValue());
+                        }
+                    }
+                }
+//              ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, entry.getValue());
+//              mMessagesView.setAdapter(adapter);
+
+                System.out.println("this is the HashMap = " + mLocationMessages);
+                System.out.println("this is the users location = " + userLocation);
             }
         });
-    }
-
-//    //GRABBING LOCATION AND MESSAGE TO STICK IN HASH
-//    private void sendLocalMessage(Double userLat, Double userLong, String message){
-//        LatLng currentLatLng = new LatLng(userLat, userLong);
-//        String[] messageArray = {};
-//    }
-
-    //GETTING MESSAGES THAT ARE IN USERS LOCATION
-    private ArrayList<String> getMessageLocation() {
-        ArrayList<String> messagesInUserLocation = new ArrayList<String>();
-        for (Map.Entry<LatLng, ArrayList<String>> entry : mMessages.entrySet()) {
-            ///THIS IS A CHECK TO SEE IF USER IS WITHIN A CERTAIN DISTANCE OF VIEWABLE MESSAGES  --------FINISH THIS!!!!!!!!! JUST DO LONGITUDE BRUH!!!!!!------
-            if (entry.getKey().latitude + radius > userLocation.latitude && userLocation.latitude < entry.getKey().latitude + radius && entry.getKey().longitude + radius > userLocation.longitude) {
-                ///IF YOU'RE AT A LOCATION WITH MESSAGES IT GRABS ALL THE MESSAGES
-                for (int i = 0; i < entry.getValue().size(); i++) {
-                    String message = (entry.getValue().get(i));
-                    messagesInUserLocation.add(message);
-                }
-            }
-        }
-        return messagesInUserLocation;
     }
 
     private final LocationListener listener = new LocationListener() {
@@ -162,7 +156,6 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap)
     {
-//        Toast.makeText(UserActivity.this, "IN ONMAPREADY METHOD", Toast.LENGTH_SHORT).show();
         mMap = googleMap;
     }
 }
