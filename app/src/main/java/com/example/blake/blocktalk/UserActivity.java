@@ -9,10 +9,12 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import butterknife.Bind;
@@ -27,13 +29,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class UserActivity extends FragmentActivity implements OnMapReadyCallback {
     @Bind(R.id.GetUser)
     TextView mGetUser;
     @Bind(R.id.MessagesView)
     ListView mMessagesView;
-    private String[] messages = {"Bill: hey", "Jim: sup", "Michaela: hi",
-            "Blake: yo", "Jim: sup", "Blake: yo"};
+    @Bind(R.id.LocalMessage)
+    EditText mUserMessage;
+    @Bind(R.id.SubmitLocalMessage)
+    Button mSubmitLocalMessage;
+    HashMap <LatLng, String[]> mMessages = new HashMap<LatLng, String[]>();
+    private ArrayList<String> fakeMessages = new ArrayList<String>();
     private GoogleMap mMap;
     LocationManager locationManager;
     Double userLong;
@@ -41,18 +50,23 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     LatLng userLocation;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
         ButterKnife.bind(this);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
         Intent intent = getIntent();
         String username = intent.getStringExtra("username");
+        String newMessage = intent.getStringExtra("message");
         mGetUser.setText("Hey, " + username + "!");
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, messages);
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, fakeMessages);
         mMessagesView.setAdapter(adapter);
+
         ////////location stuff//////////
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
@@ -71,14 +85,26 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 return;
             }
-            Toast.makeText(UserActivity.this, "IN IF STATEMENT", Toast.LENGTH_SHORT).show();
-
             locationManager.requestLocationUpdates(provider, 1000, 0, listener);
-
         }
+        //LOCAL MESSAGE SUBMIT
+        mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String userMessage = mUserMessage.getText().toString();
+                sendLocalMessage(userLat, userLong, userMessage);
+            }
+        });
     }
 
-   private final LocationListener listener = new LocationListener() {
+
+    //GRABBING LOCATION AND MESSAGE TO STICK IN HASH
+    private void sendLocalMessage(Double userLat, Double userLong, String message){
+        LatLng currentLatLng = new LatLng(userLat, userLong);
+        String[] messageArray = {};
+    }
+
+    private final LocationListener listener = new LocationListener() {
         public void onLocationChanged(Location location) {
             userLong = location.getLongitude();
             userLat = location.getLatitude();
@@ -86,9 +112,9 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(UserActivity.this, "IN RUN METHOD", Toast.LENGTH_SHORT).show();
+                    ///CREATING MARKER ON MAP OF USERS CURRENT LOCATION.
                     userLocation = new LatLng(userLat, userLong);
-                    mMap.addMarker(new MarkerOptions().position(userLocation).title("Marker in Sydney"));
+                    mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Current Location"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
                 }
             });
@@ -114,7 +140,7 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap)
     {
-        Toast.makeText(UserActivity.this, "IN ONMAPREADY METHOD", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(UserActivity.this, "IN ONMAPREADY METHOD", Toast.LENGTH_SHORT).show();
         mMap = googleMap;
     }
 }
