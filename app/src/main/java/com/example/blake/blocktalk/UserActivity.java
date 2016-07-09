@@ -28,9 +28,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class UserActivity extends FragmentActivity implements OnMapReadyCallback {
     @Bind(R.id.GetUser)
@@ -41,14 +41,16 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     EditText mUserMessage;
     @Bind(R.id.SubmitLocalMessage)
     Button mSubmitLocalMessage;
-    HashMap <LatLng, String[]> mMessages = new HashMap<LatLng, String[]>();
-    private ArrayList<String> fakeMessages = new ArrayList<String>();
+    ///mMessages is what stores location and messages in that location.
+    ArrayList<String> messages = new ArrayList<String>();
+    Map <LatLng, ArrayList<String>> mMessages = new HashMap<LatLng, ArrayList<String>>();
     private GoogleMap mMap;
     LocationManager locationManager;
     Double userLong;
     Double userLat;
     LatLng userLocation;
-
+    //Message visibility radius.
+    Double radius = .0005;
 
 
     @Override
@@ -64,10 +66,11 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
         String username = intent.getStringExtra("username");
         String newMessage = intent.getStringExtra("message");
         mGetUser.setText("Hey, " + username + "!");
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, fakeMessages);
+        //THIS IS WHERE YOU PUT THE MESSAGES TO BE SHOWN IN THE LIST.
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, getMessageLocation());
         mMessagesView.setAdapter(adapter);
 
-        ////////location stuff//////////
+        ////////FIND USER LOCATION WITH PERMISSIONS//////////
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -92,16 +95,35 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 String userMessage = mUserMessage.getText().toString();
-                sendLocalMessage(userLat, userLong, userMessage);
+                messages.add(userMessage);
+                mMessages.put(userLocation, messages);
+                System.out.println("this is the users location =" + userLocation);
+                System.out.println("this is the users message =" + mUserMessage);
+                System.out.println("this is the users messageArray =" + messages);
             }
         });
     }
 
+//    //GRABBING LOCATION AND MESSAGE TO STICK IN HASH
+//    private void sendLocalMessage(Double userLat, Double userLong, String message){
+//        LatLng currentLatLng = new LatLng(userLat, userLong);
+//        String[] messageArray = {};
+//    }
 
-    //GRABBING LOCATION AND MESSAGE TO STICK IN HASH
-    private void sendLocalMessage(Double userLat, Double userLong, String message){
-        LatLng currentLatLng = new LatLng(userLat, userLong);
-        String[] messageArray = {};
+    //GETTING MESSAGES THAT ARE IN USERS LOCATION
+    private ArrayList<String> getMessageLocation() {
+        ArrayList<String> messagesInUserLocation = new ArrayList<String>();
+        for (Map.Entry<LatLng, ArrayList<String>> entry : mMessages.entrySet()) {
+            ///THIS IS A CHECK TO SEE IF USER IS WITHIN A CERTAIN DISTANCE OF VIEWABLE MESSAGES
+            if (entry.getKey().latitude + radius == userLocation.latitude && entry.getKey().longitude + radius == userLocation.longitude) {
+                ///IF YOU'RE AT A LOCATION WITH MESSAGES IT GRABS ALL THE MESSAGES
+                for (int i = 0; i < entry.getValue().size(); i++) {
+                    String message = (entry.getValue().get(i));
+                    messagesInUserLocation.add(message);
+                }
+            }
+        }
+        return messagesInUserLocation;
     }
 
     private final LocationListener listener = new LocationListener() {
