@@ -86,7 +86,7 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
             locationManager.requestLocationUpdates(provider, 1000, 0, listener);
         }
 
-        ///LOCAL MESSAGE SUBMIT
+        ///LOCAL MESSAGE SUBMIT                                                 Location check is wrong, check that you radius and rounding is doing what its supposed to.
         mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,11 +102,16 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 if (mLocationMessages.size() >= 1) {
                     for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
                         //checks if there is already hash within radius location, if so it just adds a message to it.
+                        System.out.println("this is entry lat = " + entry.getKey().latitude);
+                        System.out.println("this is entry long = " + entry.getKey().longitude);
                         if (entry.getKey().latitude + radius > Math.abs(userLocation.latitude) && Math.abs(userLocation.latitude) < entry.getKey().latitude - radius && entry.getKey().longitude + radius > Math.abs(userLocation.longitude) && Math.abs(userLocation.longitude) < entry.getKey().longitude - radius) {
                             entry.getValue().add(userMessage);
                             //if users location is not within radius of a hash in hashmap, it creates new hash with message.
                         } else {
-                            mLocationMessages.put(userLocation, newMessages);
+                            ArrayList<String> newMessageList = new ArrayList<String>();
+                            String newMessage = mUserMessage.getText().toString();
+                            newMessageList.add(newMessage);
+                            mLocationMessages.put(userLocation, newMessageList);
                             System.out.println("this is messages in your location = " + entry.getValue());
                         }
                     }
