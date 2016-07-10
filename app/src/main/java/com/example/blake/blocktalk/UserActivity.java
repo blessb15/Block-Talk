@@ -8,6 +8,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
+import java.text.*;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
@@ -38,7 +39,6 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     EditText mUserMessage;
     @Bind(R.id.SubmitLocalMessage)
     Button mSubmitLocalMessage;
-    ///mMessages is what stores location and messages in that location.
     ArrayList<String> newMessages = new ArrayList<String>();
     Map <LatLng, ArrayList<String>> mLocationMessages = new HashMap<LatLng, ArrayList<String>>();
     private GoogleMap mMap;
@@ -47,7 +47,10 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     Double userLat;
     LatLng userLocation;
     //Message visibility radius.
-    Double radius = .0005;
+    Double radius = 0.0003;
+    //lat and long format
+    DecimalFormat df = new DecimalFormat("##.####");
+
 
 
     @Override
@@ -104,7 +107,8 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                         //checks if there is already hash within radius location, if so it just adds a message to it.
                         System.out.println("this is entry lat = " + entry.getKey().latitude);
                         System.out.println("this is entry long = " + entry.getKey().longitude);
-                        if (entry.getKey().latitude + radius > Math.abs(userLocation.latitude) && Math.abs(userLocation.latitude) < entry.getKey().latitude - radius && entry.getKey().longitude + radius > Math.abs(userLocation.longitude) && Math.abs(userLocation.longitude) < entry.getKey().longitude - radius) {
+
+                        if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
                             entry.getValue().add(userMessage);
                             //if users location is not within radius of a hash in hashmap, it creates new hash with message.
                         } else {
