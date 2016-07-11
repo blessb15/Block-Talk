@@ -41,6 +41,7 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     EditText mUserMessage;
     @Bind(R.id.SubmitLocalMessage)
     Button mSubmitLocalMessage;
+    @Bind(R.id.CurrentLatLongView) TextView mCurrentLatLongView;
     ArrayList<String> newMessages = new ArrayList<String>();
     Map <LatLng, ArrayList<String>> mLocationMessages = new HashMap<LatLng, ArrayList<String>>();
     private GoogleMap mMap;
@@ -95,7 +96,8 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         ///LOCAL MESSAGE SUBMIT                                                 Location check is wrong, check that you radius and rounding is doing what its supposed to.
-        mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
+        mSubmitLocalMessage.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View view) {
 
@@ -109,6 +111,8 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                     if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
                         String newMessage = username + ": " + mUserMessage.getText().toString();
                         entry.getValue().add(newMessage);
+                        mUserMessage.setText("");
+                        mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
                         System.out.println("this is to see if duplicate message");
                         //if users location is not within radius of a hash in hashmap, it creates new hash with message.
                     } else {
@@ -116,6 +120,8 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                         String newMessage = username + ": " + mUserMessage.getText().toString();
                         newMessages.add(newMessage);
                         mLocationMessages.put(userLocation, newMessages);
+                        mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
+                        mUserMessage.setText("");
                         System.out.println("this is messages in your location = " + entry.getValue());
                     }
                 }
@@ -127,6 +133,8 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 String userMessage = username + ": " + mUserMessage.getText().toString();
                 newMessages.add(userMessage);
                 mLocationMessages.put(userLocation, newMessages);
+                mUserMessage.setText("");
+                mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
                 System.out.println("this is first location and message = " + mLocationMessages);
             }
                 System.out.println("this is the HashMap = " + mLocationMessages);
@@ -145,6 +153,7 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 public void run() {
                     ///CREATING MARKER ON MAP OF USERS CURRENT LOCATION.
                     userLocation = new LatLng(userLat, userLong);
+                    mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
                 }
             });
