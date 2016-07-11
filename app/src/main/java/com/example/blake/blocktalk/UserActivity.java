@@ -108,10 +108,8 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
 
-
             //if there are hashes
             if (mLocationMessages.size() >= 1) {
-                getMessages();
                 for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
                     //checks if there is already hash within radius location, if so it just adds a message to it.
                     if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
@@ -138,7 +136,11 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 mUserMessage.setText("");
                 mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
             }
+                if (mLocationMessages.size() >= 0) {
+                    getMessages();
+                }
             }
+
 
         });
     }
