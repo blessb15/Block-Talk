@@ -63,7 +63,7 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         Intent intent = getIntent();
-        String username = intent.getStringExtra("username");
+        final String username = intent.getStringExtra("username");
         String newMessage = intent.getStringExtra("message");
         mGetUser.setText("Hey, " + username + "!");
 
@@ -93,33 +93,36 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
         mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String userMessage = mUserMessage.getText().toString();
-                newMessages.add(userMessage);
 
-                //if there are no hashes
-                if (mLocationMessages.size() == 0) {
-                    mLocationMessages.put(userLocation, newMessages);
-                }
 
-                //if there are hashes
-                if (mLocationMessages.size() >= 1) {
-                    for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
-                        //checks if there is already hash within radius location, if so it just adds a message to it.
-                        System.out.println("this is entry lat = " + entry.getKey().latitude);
-                        System.out.println("this is entry long = " + entry.getKey().longitude);
-
-                        if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
-                            entry.getValue().add(userMessage);
-                            //if users location is not within radius of a hash in hashmap, it creates new hash with message.
-                        } else {
-                            ArrayList<String> newMessageList = new ArrayList<String>();
-                            String newMessage = mUserMessage.getText().toString();
-                            newMessageList.add(newMessage);
-                            mLocationMessages.put(userLocation, newMessageList);
-                            System.out.println("this is messages in your location = " + entry.getValue());
-                        }
+            //if there are hashes
+            if (mLocationMessages.size() >= 1) {
+                for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
+                    System.out.println("this is entry lat = " + entry.getKey().latitude);
+                    System.out.println("this is entry long = " + entry.getKey().longitude);
+                    //checks if there is already hash within radius location, if so it just adds a message to it.
+                    if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
+                        String newMessage = username + ": " + mUserMessage.getText().toString();
+                        entry.getValue().add(newMessage);
+                        System.out.println("this is to see if duplicate message");
+                        //if users location is not within radius of a hash in hashmap, it creates new hash with message.
+                    } else {
+                        ArrayList<String> newMessageList = new ArrayList<String>();
+                        String newMessage = username + ": " + mUserMessage.getText().toString();
+                        newMessageList.add(newMessage);
+                        mLocationMessages.put(userLocation, newMessageList);
+                        System.out.println("this is messages in your location = " + entry.getValue());
                     }
                 }
+            }
+
+            //if there are no hashes
+            if (mLocationMessages.size() == 0) {
+                String userMessage = username + ": " + mUserMessage.getText().toString();
+                newMessages.add(userMessage);
+                mLocationMessages.put(userLocation, newMessages);
+                System.out.println("this is first location and message = " + mLocationMessages);
+            }
 //              ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, entry.getValue());
 //              mMessagesView.setAdapter(adapter);
 
