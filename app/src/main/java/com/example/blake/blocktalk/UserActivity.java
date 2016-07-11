@@ -20,6 +20,8 @@ import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import android.support.v4.app.FragmentActivity;
+
+import com.google.android.gms.fitness.data.Value;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -58,6 +60,9 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
         ButterKnife.bind(this);
+
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, newMessages);
+        mMessagesView.setAdapter(adapter);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -107,14 +112,15 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                         System.out.println("this is to see if duplicate message");
                         //if users location is not within radius of a hash in hashmap, it creates new hash with message.
                     } else {
-                        ArrayList<String> newMessageList = new ArrayList<String>();
+//                        ArrayList<String> newMessageList = new ArrayList<String>();
                         String newMessage = username + ": " + mUserMessage.getText().toString();
-                        newMessageList.add(newMessage);
-                        mLocationMessages.put(userLocation, newMessageList);
+                        newMessages.add(newMessage);
+                        mLocationMessages.put(userLocation, newMessages);
                         System.out.println("this is messages in your location = " + entry.getValue());
                     }
                 }
             }
+
 
             //if there are no hashes
             if (mLocationMessages.size() == 0) {
@@ -123,9 +129,6 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 mLocationMessages.put(userLocation, newMessages);
                 System.out.println("this is first location and message = " + mLocationMessages);
             }
-//              ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, entry.getValue());
-//              mMessagesView.setAdapter(adapter);
-
                 System.out.println("this is the HashMap = " + mLocationMessages);
                 System.out.println("this is the users location = " + userLocation);
             }
@@ -142,7 +145,6 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 public void run() {
                     ///CREATING MARKER ON MAP OF USERS CURRENT LOCATION.
                     userLocation = new LatLng(userLat, userLong);
-                    mMap.addMarker(new MarkerOptions().position(userLocation).title("Your Current Location"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
                 }
             });
