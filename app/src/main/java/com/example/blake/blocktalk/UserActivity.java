@@ -54,16 +54,23 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     //lat and long format
     DecimalFormat df = new DecimalFormat("##.####");
 
-
+    private void getMessages() {
+        for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
+            if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
+                ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, entry.getValue());
+                System.out.println("this is messages in your location " + entry.getValue());
+                mMessagesView.setAdapter(adapter);
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
         ButterKnife.bind(this);
+        //this will make sure you are only seeing messages in your location.
 
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, newMessages);
-        mMessagesView.setAdapter(adapter);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -104,29 +111,24 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
 
             //if there are hashes
             if (mLocationMessages.size() >= 1) {
+                getMessages();
                 for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
-                    System.out.println("this is entry lat = " + entry.getKey().latitude);
-                    System.out.println("this is entry long = " + entry.getKey().longitude);
                     //checks if there is already hash within radius location, if so it just adds a message to it.
                     if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
                         String newMessage = username + ": " + mUserMessage.getText().toString();
                         entry.getValue().add(newMessage);
                         mUserMessage.setText("");
                         mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
-                        System.out.println("this is to see if duplicate message");
                         //if users location is not within radius of a hash in hashmap, it creates new hash with message.
                     } else {
-//                        ArrayList<String> newMessageList = new ArrayList<String>();
                         String newMessage = username + ": " + mUserMessage.getText().toString();
                         newMessages.add(newMessage);
                         mLocationMessages.put(userLocation, newMessages);
                         mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
                         mUserMessage.setText("");
-                        System.out.println("this is messages in your location = " + entry.getValue());
                     }
                 }
             }
-
 
             //if there are no hashes
             if (mLocationMessages.size() == 0) {
@@ -135,11 +137,9 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 mLocationMessages.put(userLocation, newMessages);
                 mUserMessage.setText("");
                 mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
-                System.out.println("this is first location and message = " + mLocationMessages);
             }
-                System.out.println("this is the HashMap = " + mLocationMessages);
-                System.out.println("this is the users location = " + userLocation);
             }
+
         });
     }
 
