@@ -6,3 +6,6 @@
 .DS_Store
 /build
 /captures
+/app/src/main/java/com/example/blake/blocktalk/Constants.java
+app/libs/
+app/src/main/java/com/example/blake/blocktalk/Constants
