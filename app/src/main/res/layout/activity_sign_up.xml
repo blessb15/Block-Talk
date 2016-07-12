@@ -14,44 +14,6 @@
         android:src="@drawable/block4"
         android:scaleType="centerCrop" />
 
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/usernameSignUp"
-        android:autoText="false"
-        android:hint="Username"
-        android:layout_marginBottom="66dp"
-        android:layout_above="@+id/passwordSignIn"
-        android:layout_alignLeft="@+id/submitSignUp"
-        android:layout_alignStart="@+id/submitSignUp"
-        android:textAlignment="center"
-        android:textColorHint="@color/colorWhite"
-        android:textColor="@color/colorWhite" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:id="@+id/passwordSignIn"
-        android:hint="Password"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:textAlignment="center"
-        android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorWhite" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Submit"
-        android:id="@+id/submitSignUp"
-        android:layout_marginTop="101dp"
-        android:background="@color/colorAccent"
-        android:layout_below="@+id/passwordSignIn"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/colorWhite" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,5 +23,64 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorWhite" />
+        android:textColorHint="@color/colorWhite"
+        android:id="@+id/textView3" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/usernameSignUp"
+        android:autoText="false"
+        android:hint="Username"
+        android:textAlignment="center"
+        android:textColorHint="@color/colorWhite"
+        android:textColor="@color/colorWhite"
+        android:layout_marginTop="67dp"
+        android:layout_below="@+id/textView3"
+        android:layout_alignRight="@+id/submitSignUp"
+        android:layout_alignEnd="@+id/submitSignUp"
+        android:textSize="20dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:id="@+id/emailSignUp"
+        android:layout_below="@+id/textView3"
+        android:layout_alignLeft="@+id/passwordSignIn"
+        android:layout_alignStart="@+id/passwordSignIn"
+        android:layout_marginTop="172dp"
+        android:hint="Email"
+        android:textColor="@color/colorWhite"
+        android:textColorHint="@color/colorWhite"
+        android:textAlignment="center"
+        android:textSize="20dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passwordSignIn"
+        android:hint="Password"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textColorHint="@color/colorWhite"
+        android:layout_marginTop="54dp"
+        android:layout_below="@+id/emailSignUp"
+        android:layout_centerHorizontal="true"
+        android:textSize="20dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit"
+        android:id="@+id/submitSignUp"
+        android:layout_marginTop="72dp"
+        android:background="@color/colorAccent"
+        android:textColor="@color/colorWhite"
+        android:layout_below="@+id/passwordSignIn"
+        android:layout_centerHorizontal="true" />
+
 </RelativeLayout>
