@@ -8,7 +8,10 @@ but this message will only be visible if they are a blocks distance away.
 * _Download files._
 * _Open in Android SDK_
 * _create android emulator or plug android device in_
+* _create Constants.java file in main file_
+* _put api key in file, check DummyConstants for reference_
 * _run app_
+
 
 ## Known Bugs
 
