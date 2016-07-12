@@ -2,4 +2,7 @@
     <string name="app_name">BlockTalk</string>
     <string name="title_activity_user">Map</string>
     <string name="bt">BT</string>
+    <string name="weather_key" templateMergeStrategy="preserve" translatable="false">
+        7ef0e77df5b9d3c3
+    </string>
 </resources>

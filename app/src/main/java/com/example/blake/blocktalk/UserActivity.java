@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -18,17 +19,24 @@ import android.widget.ListView;
 import android.widget.TextView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import android.support.v4.app.FragmentActivity;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+
+//import android.support.v4.app.FragmentActivity;
+//import com.google.android.gms.maps.GoogleMap;
+//import com.google.android.gms.maps.OnMapReadyCallback;
+//import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class UserActivity extends FragmentActivity implements OnMapReadyCallback {
+public class UserActivity extends AppCompatActivity {
     @Bind(R.id.GetUser)
     TextView mGetUser;
     @Bind(R.id.MessagesView)
@@ -37,15 +45,18 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
     EditText mUserMessage;
     @Bind(R.id.SubmitLocalMessage)
     Button mSubmitLocalMessage;
-    @Bind(R.id.CurrentLatLongView) TextView mCurrentLatLongView;
+    @Bind(R.id.locationInfoText) TextView mLocationInfoText;
     private ArrayList<String> newMessages = new ArrayList<String>();
     private Map <LatLng, ArrayList<String>> mLocationMessages = new HashMap<LatLng, ArrayList<String>>();
-    private GoogleMap mMap;
+//    private GoogleMap mMap;
+    public ArrayList<LocationInfo> mLocationInfos = new ArrayList<LocationInfo>();
     private LocationManager locationManager;
-    private Double userLong;
-    private Double userLat;
-    private LatLng userLocation;
+    public static Double userLong;
+    public static Double userLat;
+    public static LatLng userLocation;
     private Double radius = 0.0003;
+
+
 
 
     @Override
@@ -57,9 +68,19 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, newMessages);
         mMessagesView.setAdapter(adapter);
 
+        Timer timer = new Timer();
+        TimerTask myTask = new TimerTask() {
+            @Override
+            public void run() {
+                getLocationInfo();
+                System.out.println("location info refreshing...");
+            }
+        };
+        timer.schedule(myTask, 1*60*1000, 1*60*2000);
+
         //Map fragment setup
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+//        mapFragment.getMapAsync(this);
 
         Intent intent = getIntent();
         final String username = intent.getStringExtra("username");
@@ -87,8 +108,7 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
             }
             locationManager.requestLocationUpdates(provider, 1000, 0, listener);
         }
-
-        ///LOCAL MESSAGE SUBMIT                                                 Location check is wrong, check that you radius and rounding is doing what its supposed to.
+        ///LOCAL MESSAGE SUBMIT                                                 Constants check is wrong, check that you radius and rounding is doing what its supposed to.
         mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,14 +121,14 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                             String newMessage = username + ": " + mUserMessage.getText().toString();
                             entry.getValue().add(newMessage);
                             mUserMessage.setText("");
-                            mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
+                            getLocationInfo();
                             //if users location is not within radius of a hash in hashmap, it creates new hash with message.
                         } else {
                             String newMessage = username + ": " + mUserMessage.getText().toString();
                             newMessages.add(newMessage);
                             mLocationMessages.put(userLocation, newMessages);
-                            mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
                             mUserMessage.setText("");
+                            getLocationInfo();
                         }
                     }
                 }
@@ -119,13 +139,39 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                     newMessages.add(userMessage);
                     mLocationMessages.put(userLocation, newMessages);
                     mUserMessage.setText("");
-                    mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
+                    getLocationInfo();
                 }
             }
         });
     }
 
+    private void getLocationInfo(){
+        System.out.println("YO getWeather");
+        final LocationInfoService weatherService = new LocationInfoService();
+        weatherService.getWeather(new Callback() {
 
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response){
+                System.out.println("YO on response");
+                mLocationInfos = weatherService.processResults(response);
+                UserActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("YO on ui thread");
+                        for(int i = 0; i < mLocationInfos.size(); i++){
+                            mLocationInfoText.setText("Your current Location: " + mLocationInfos.get(i).getFullName());
+                        }
+                    }
+                });
+            }
+        });
+    }
 
     private final LocationListener listener = new LocationListener() {
         public void onLocationChanged(Location location) {
@@ -137,15 +183,14 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
                 public void run() {
                     ///CREATING MARKER ON MAP OF USERS CURRENT LOCATION.
                     userLocation = new LatLng(userLat, userLong);
-                    mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+//                    mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
                 }
             });
         }
 
         @Override
         public void onStatusChanged(String s, int i, Bundle bundle) {
-
         }
 
         @Override
@@ -155,14 +200,13 @@ public class UserActivity extends FragmentActivity implements OnMapReadyCallback
 
         @Override
         public void onProviderDisabled(String s) {
-
         }
     };
 
 
-    @Override
-    public void onMapReady(GoogleMap googleMap)
-    {
-        mMap = googleMap;
-    }
+//    @Override
+//    public void onMapReady(GoogleMap googleMap)
+//    {
+//        mMap = googleMap;
+//    }
 }
