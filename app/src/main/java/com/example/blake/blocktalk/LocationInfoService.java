@@ -1,5 +1,7 @@
 package com.example.blake.blocktalk;
 
+import com.example.blake.blocktalk.UserActivity;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
@@ -27,7 +29,7 @@ public class LocationInfoService {
 
 
         Request request = new Request.Builder()
-                .url("http://api.wunderground.com/api/" + Constants.key + "/geolookup/q/45.359552,-122.629517.json")
+                .url("http://api.wunderground.com/api/" + Constants.key + "/geolookup/q/" + UserActivity.userLat + "," + UserActivity.userLong + ".json")
                 .post(postData)
                 .build();
 
@@ -35,6 +37,8 @@ public class LocationInfoService {
 //        " + UserActivity.userLocation + "
 //        http://api.wunderground.com/api/7ef0e77df5b9d3c3/geolookup/q/37.776289,-122.395234.json
 //        http://api.wunderground.com/api/" + Constants.key + "/conditions/q/" + UserActivity.userLocation + ".json
+        System.out.println("YO" + Constants.key);
+        System.out.println("http://api.wunderground.com/api/" + Constants.key + "/geolookup/q/" + UserActivity.userLat + "," + UserActivity.userLat + ".json");
         System.out.println("YO on getweather4");
 
 
