@@ -5,5 +5,4 @@
 /.idea/libraries
 .DS_Store
 /build
-/captures
-/app/src/main/java/com/example/blake/blocktalk/Constants.java
+
