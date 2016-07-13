@@ -17,21 +17,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-
-//import android.support.v4.app.FragmentActivity;
-//import com.google.android.gms.maps.GoogleMap;
-//import com.google.android.gms.maps.OnMapReadyCallback;
-//import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -48,7 +48,6 @@ public class UserActivity extends AppCompatActivity {
     @Bind(R.id.locationInfoText) TextView mLocationInfoText;
     private ArrayList<String> newMessages = new ArrayList<String>();
     private Map <LatLng, ArrayList<String>> mLocationMessages = new HashMap<LatLng, ArrayList<String>>();
-//    private GoogleMap mMap;
     public ArrayList<LocationInfo> mLocationInfos = new ArrayList<LocationInfo>();
     private LocationManager locationManager;
     public static Double userLong;
@@ -57,13 +56,14 @@ public class UserActivity extends AppCompatActivity {
     private Double radius = 0.0003;
 
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
         ButterKnife.bind(this);
+
+
 
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, newMessages);
         mMessagesView.setAdapter(adapter);
@@ -77,10 +77,6 @@ public class UserActivity extends AppCompatActivity {
             }
         };
         timer.schedule(myTask, 1*60*1000, 1*60*2000);
-
-        //Map fragment setup
-//        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
 
         Intent intent = getIntent();
         final String username = intent.getStringExtra("username");
@@ -96,7 +92,7 @@ public class UserActivity extends AppCompatActivity {
         criteria.setCostAllowed(true);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
 
-        ///sets refresh of user location.
+        ///SETS REFRESH ON USER LOCATION TO EVERY SECOND.
         String provider = locationManager.getBestProvider(criteria, true);
         if (provider != null) {
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -108,47 +104,62 @@ public class UserActivity extends AppCompatActivity {
             }
             locationManager.requestLocationUpdates(provider, 1000, 0, listener);
         }
+
         ///LOCAL MESSAGE SUBMIT                                                 Constants check is wrong, check that you radius and rounding is doing what its supposed to.
         mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                //if there are hashes
-                if (mLocationMessages.size() >= 1) {
-                    for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
-                        //checks if there is already hash within radius location, if so it just adds a message to it.
-                        if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
-                            String newMessage = username + ": " + mUserMessage.getText().toString();
-                            entry.getValue().add(newMessage);
-                            mUserMessage.setText("");
-                            getLocationInfo();
-                            //if users location is not within radius of a hash in hashmap, it creates new hash with message.
-                        } else {
-                            String newMessage = username + ": " + mUserMessage.getText().toString();
-                            newMessages.add(newMessage);
-                            mLocationMessages.put(userLocation, newMessages);
-                            mUserMessage.setText("");
-                            getLocationInfo();
-                        }
-                    }
+
+                List<String> messages = new ArrayList<>();
+                messages.add("hello");
+                LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+
+                if (view == mSubmitLocalMessage) {
+                    DatabaseReference restaurantRef = FirebaseDatabase
+                            .getInstance()
+                            .getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
+                    restaurantRef.push().setValue(locationMessages);
+                    System.out.println(locationMessages);
                 }
 
-                //if there are no hashes
-                if (mLocationMessages.size() == 0) {
-                    String userMessage = username + ": " + mUserMessage.getText().toString();
-                    newMessages.add(userMessage);
-                    mLocationMessages.put(userLocation, newMessages);
-                    mUserMessage.setText("");
-                    getLocationInfo();
-                }
+//                //if there are hashes
+//                if (mLocationMessages.size() >= 1) {
+//                    for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
+//                        //checks if there is already hash within radius location, if so it just adds a message to it.
+//                        if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
+//                            String newMessage = username + ": " + mUserMessage.getText().toString();
+//                            entry.getValue().add(newMessage);
+//                            mUserMessage.setText("");
+//                            getLocationInfo();
+//
+//                            //if users location is not within radius of a hash in hashmap, it creates new hash with message.
+//                        } else {
+//                            String newMessage = username + ": " + mUserMessage.getText().toString();
+//                            newMessages.add(newMessage);
+//                            mLocationMessages.put(userLocation, newMessages);
+//                            mUserMessage.setText("");
+//                            getLocationInfo();
+//                        }
+//                    }
+//                }
+//
+//                //if there are no hashes
+//                if (mLocationMessages.size() == 0) {
+//                    String userMessage = username + ": " + mUserMessage.getText().toString();
+//                    newMessages.add(userMessage);
+//                    mLocationMessages.put(userLocation, newMessages);
+//                    mUserMessage.setText("");
+//                    getLocationInfo();
+//                }
             }
         });
     }
 
     private void getLocationInfo(){
         System.out.println("YO getWeather");
-        final LocationInfoService weatherService = new LocationInfoService();
-        weatherService.getWeather(new Callback() {
+        final LocationInfoService locationService = new LocationInfoService();
+        locationService.getWeather(new Callback() {
 
 
             @Override
@@ -159,13 +170,13 @@ public class UserActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response){
                 System.out.println("YO on response");
-                mLocationInfos = weatherService.processResults(response);
+                mLocationInfos = locationService.processResults(response);
                 UserActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         System.out.println("YO on ui thread");
                         for(int i = 0; i < mLocationInfos.size(); i++){
-                            mLocationInfoText.setText("Your current Location: " + mLocationInfos.get(i).getFullName());
+                            mLocationInfoText.setText("Your current LocationMessages: " + mLocationInfos.get(i).getFullName());
                         }
                     }
                 });
@@ -183,8 +194,8 @@ public class UserActivity extends AppCompatActivity {
                 public void run() {
                     ///CREATING MARKER ON MAP OF USERS CURRENT LOCATION.
                     userLocation = new LatLng(userLat, userLong);
-//                    mCurrentLatLongView.setText("These are the messages at your current " + userLocation);
-//                    mMap.moveCamera(CameraUpdateFactory.newLatLng(userLocation));
+
+
                 }
             });
         }
@@ -202,11 +213,4 @@ public class UserActivity extends AppCompatActivity {
         public void onProviderDisabled(String s) {
         }
     };
-
-
-//    @Override
-//    public void onMapReady(GoogleMap googleMap)
-//    {
-//        mMap = googleMap;
-//    }
 }

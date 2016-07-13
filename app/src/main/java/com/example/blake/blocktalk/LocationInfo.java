@@ -15,5 +15,4 @@ public class LocationInfo {
         return mFullName;
     }
 
-
 }
