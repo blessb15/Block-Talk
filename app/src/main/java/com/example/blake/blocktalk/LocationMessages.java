@@ -1,7 +1,5 @@
 package com.example.blake.blocktalk;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,20 +7,22 @@ import java.util.List;
  * Created by Guest on 7/13/16.
  */
 public class LocationMessages {
-    private List<String> mMessages = new ArrayList<>();
-    private LatLng latlng;
+    public List<String> messages = new ArrayList<>();
+    public LatLng latLng;
 
-    public LocationMessages(LatLng latlng, List<String> messages) {
-        this.mMessages = messages;
-        this.latlng = latlng;
+    public LocationMessages(LatLng latLng, List<String> messages) {
+        this.messages = messages;
+        this.latLng = latLng;
     }
 
+    public LocationMessages(){};
+
     public LatLng getLatLng(){
-        return this.latlng;
+        return this.latLng;
     }
 
     public List<String> getMessages(){
-        return this.mMessages;
+        return this.messages;
     }
 
 

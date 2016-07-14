@@ -17,17 +17,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
+import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,18 +45,48 @@ public class UserActivity extends AppCompatActivity {
     @Bind(R.id.SubmitLocalMessage)
     Button mSubmitLocalMessage;
     @Bind(R.id.locationInfoText) TextView mLocationInfoText;
-    private ArrayList<String> newMessages = new ArrayList<String>();
-    private Map <LatLng, ArrayList<String>> mLocationMessages = new HashMap<LatLng, ArrayList<String>>();
+//    @Bind(R.id.getEmail) EditText mUserEmail;
+//    @Bind(R.id.getPassword) EditText mUserPassword;
     public ArrayList<LocationInfo> mLocationInfos = new ArrayList<LocationInfo>();
     private LocationManager locationManager;
     public static Double userLong;
     public static Double userLat;
     public static LatLng userLocation;
     private Double radius = 0.0003;
+    private DatabaseReference mLocationMessagesReference;
+    final ArrayList<LocationMessages> locationMessagesList = new ArrayList<>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
+
+        mLocationMessagesReference = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
+        final Context stuff = this;
+        mLocationMessagesReference.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                    locationMessagesList.add(locationSnapshot.getValue(LocationMessages.class));
+                    System.out.println("YO this is messages at first spot " + locationMessagesList.get(0).getMessages());
+                    for(int i = 0; i < locationMessagesList.size(); i++){
+                        if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
+                            ArrayAdapter adapter = new ArrayAdapter(stuff, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
+                            mMessagesView.setAdapter(adapter);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
@@ -65,8 +94,8 @@ public class UserActivity extends AppCompatActivity {
 
 
 
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, newMessages);
-        mMessagesView.setAdapter(adapter);
+//        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, );
+//        mMessagesView.setAdapter(adapter);
 
         Timer timer = new Timer();
         TimerTask myTask = new TimerTask() {
@@ -76,12 +105,13 @@ public class UserActivity extends AppCompatActivity {
                 System.out.println("location info refreshing...");
             }
         };
+
         timer.schedule(myTask, 1*60*1000, 1*60*2000);
 
         Intent intent = getIntent();
         final String username = intent.getStringExtra("username");
         String newMessage = intent.getStringExtra("message");
-        mGetUser.setText("Hey, " + username + "!");
+        mGetUser.setText("Hey");
 
         ///FIND USER LOCATION WITH PERMISSIONS
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -109,57 +139,48 @@ public class UserActivity extends AppCompatActivity {
         mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-
-                List<String> messages = new ArrayList<>();
-                messages.add("hello");
-                LocationMessages locationMessages = new LocationMessages(userLocation, messages);
-
                 if (view == mSubmitLocalMessage) {
-                    DatabaseReference restaurantRef = FirebaseDatabase
+                    DatabaseReference locationMessagesRef = FirebaseDatabase
                             .getInstance()
                             .getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
-                    restaurantRef.push().setValue(locationMessages);
-                    System.out.println(locationMessages);
-                }
 
-//                //if there are hashes
-//                if (mLocationMessages.size() >= 1) {
-//                    for (Map.Entry<LatLng, ArrayList<String>> entry : mLocationMessages.entrySet()) {
-//                        //checks if there is already hash within radius location, if so it just adds a message to it.
-//                        if (((entry.getKey().latitude + radius) > userLocation.latitude && userLocation.latitude > (entry.getKey().latitude - radius)) && ((entry.getKey().longitude + radius) > userLocation.longitude && userLocation.longitude > (entry.getKey().longitude - radius))) {
-//                            String newMessage = username + ": " + mUserMessage.getText().toString();
-//                            entry.getValue().add(newMessage);
-//                            mUserMessage.setText("");
-//                            getLocationInfo();
-//
-//                            //if users location is not within radius of a hash in hashmap, it creates new hash with message.
-//                        } else {
-//                            String newMessage = username + ": " + mUserMessage.getText().toString();
-//                            newMessages.add(newMessage);
-//                            mLocationMessages.put(userLocation, newMessages);
-//                            mUserMessage.setText("");
-//                            getLocationInfo();
-//                        }
-//                    }
-//                }
-//
-//                //if there are no hashes
-//                if (mLocationMessages.size() == 0) {
-//                    String userMessage = username + ": " + mUserMessage.getText().toString();
-//                    newMessages.add(userMessage);
-//                    mLocationMessages.put(userLocation, newMessages);
-//                    mUserMessage.setText("");
-//                    getLocationInfo();
-//                }
+                    if (locationMessagesList.size() >= 1) {
+                        for(int i = 0; i < locationMessagesList.size(); i++){
+                            if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
+                                String newMessage = mUserMessage.getText().toString();
+                                LocationMessages newLocationMessages = locationMessagesList.get(i);
+                                newLocationMessages.getMessages().add(newMessage);
+                                locationMessagesRef.push().setValue(newLocationMessages);
+                            } else {
+                                String newMessage = mUserMessage.getText().toString();
+                                List<String> messages = new ArrayList<>();
+                                messages.add(newMessage);
+                                LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+                                mUserMessage.setText("");
+                                locationMessagesRef.push().setValue(locationMessages);
+                                System.out.println("YO new location with message");
+                            }
+                        }
+                    }
+
+                    if (locationMessagesList.size() == 0) {
+                        String newMessage = mUserMessage.getText().toString();
+                        List<String> messages = new ArrayList<>();
+                        messages.add(newMessage);
+                        LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+                        mUserMessage.setText("");
+                        locationMessagesRef.push().setValue(locationMessages);
+                        System.out.println("YO first message");
+                    }
+                }
             }
         });
     }
 
     private void getLocationInfo(){
-        System.out.println("YO getWeather");
+        System.out.println("YO getLocationInfo");
         final LocationInfoService locationService = new LocationInfoService();
-        locationService.getWeather(new Callback() {
+        locationService.getLocationInfo(new Callback() {
 
 
             @Override

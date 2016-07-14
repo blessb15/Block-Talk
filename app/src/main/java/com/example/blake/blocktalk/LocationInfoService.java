@@ -19,7 +19,7 @@ import okhttp3.Response;
  */
 public class LocationInfoService {
 
-    public static void getWeather(Callback callback) {
+    public static void getLocationInfo(Callback callback) {
 
         OkHttpClient client = new OkHttpClient();
 
@@ -33,17 +33,6 @@ public class LocationInfoService {
                 .post(postData)
                 .build();
 
-//        45.359552, -122.629517
-//        " + UserActivity.userLocation + "
-//        http://api.wunderground.com/api/7ef0e77df5b9d3c3/geolookup/q/37.776289,-122.395234.json
-//        http://api.wunderground.com/api/" + Constants.key + "/conditions/q/" + UserActivity.userLocation + ".json
-        System.out.println("YO" + Constants.key);
-        System.out.println("http://api.wunderground.com/api/" + Constants.key + "/geolookup/q/" + UserActivity.userLat + "," + UserActivity.userLat + ".json");
-        System.out.println("YO on getweather4");
-
-
-
-
         Call call = client.newCall(request);
         call.enqueue(callback);
     }
@@ -52,11 +41,8 @@ public class LocationInfoService {
     public ArrayList<LocationInfo> processResults(Response response){
         ArrayList<LocationInfo> locationInfoObjects = new ArrayList<>();
         try {
-            System.out.println("YO on getweather5");
             String jsonData = response.body().string();
             if (response.isSuccessful()) {
-                System.out.println("YO on getweather6");
-                System.out.println("YO response was successful");
                 JSONObject apiJSON = new JSONObject(jsonData);
                 JSONObject current_observation = apiJSON.getJSONObject("location");
 //                for (int i = 0; i < current_observation.length(); i++) {
