@@ -27,54 +27,55 @@
         android:textColor="@color/colorWhite"
         android:layout_below="@+id/getPassword"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="65dp" />
+        android:layout_marginTop="45dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome"
+        android:text="Log In"
         android:id="@+id/textView2"
-        android:textSize="50dp"
+        android:textSize="37dp"
         android:textColor="@color/colorWhite"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentTop="false"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="21dp"
-        android:translationZ="1dp" />
+        android:layout_marginTop="44dp"
+        android:translationZ="1dp"
+        android:layout_alignParentBottom="false" />
 
     <EditText
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:inputType="textEmailAddress"
         android:ems="10"
         android:id="@+id/getEmail"
         android:hint="Email"
-        android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorWhite"
         android:textSize="20dp"
-        android:textAlignment="center"
+        android:layout_marginTop="50dp"
+        android:background="@color/colorWhite"
         android:layout_below="@+id/textView2"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="83dp" />
+        android:paddingLeft="10dp" />
 
     <EditText
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:inputType="textPassword"
         android:ems="10"
         android:id="@+id/getPassword"
         android:hint="Password"
-        android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorWhite"
         android:textSize="20dp"
-        android:textAlignment="center"
+        android:layout_marginTop="25dp"
+        android:autoText="true"
+        android:background="@color/colorWhite"
         android:layout_below="@+id/getEmail"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="80dp" />
+        android:layout_alignLeft="@+id/getEmail"
+        android:layout_alignStart="@+id/getEmail"
+        android:paddingLeft="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Dont have an account? Sign up!"
+        android:text="Don&apos;t have an account? Sign up here!"
         android:id="@+id/signUp"
         android:layout_marginTop="42dp"
         android:layout_below="@+id/signIn"

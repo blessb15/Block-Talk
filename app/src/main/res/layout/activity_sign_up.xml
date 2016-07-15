@@ -28,59 +28,84 @@
 
     <EditText
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:id="@+id/usernameSignUp"
         android:autoText="false"
         android:hint="Username"
-        android:textAlignment="center"
-        android:textColorHint="@color/colorWhite"
-        android:textColor="@color/colorWhite"
-        android:layout_marginTop="67dp"
+        android:layout_marginTop="50dp"
         android:layout_below="@+id/textView3"
-        android:layout_alignRight="@+id/submitSignUp"
-        android:layout_alignEnd="@+id/submitSignUp"
-        android:textSize="20dp" />
+        android:textSize="20dp"
+        android:background="@color/colorWhite"
+        android:layout_alignLeft="@+id/emailSignUp"
+        android:layout_alignStart="@+id/emailSignUp"
+        android:layout_alignRight="@+id/emailSignUp"
+        android:layout_alignEnd="@+id/emailSignUp"
+        android:paddingLeft="10dp" />
 
     <EditText
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:inputType="textEmailAddress"
         android:ems="10"
         android:id="@+id/emailSignUp"
-        android:layout_below="@+id/textView3"
-        android:layout_alignLeft="@+id/passwordSignIn"
-        android:layout_alignStart="@+id/passwordSignIn"
-        android:layout_marginTop="172dp"
+        android:layout_marginTop="25dp"
         android:hint="Email"
-        android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorWhite"
-        android:textAlignment="center"
-        android:textSize="20dp" />
+        android:textSize="20dp"
+        android:background="@color/colorWhite"
+        android:paddingLeft="10dp"
+        android:layout_below="@+id/usernameSignUp"
+        android:layout_alignLeft="@+id/password"
+        android:layout_alignStart="@+id/password" />
 
     <EditText
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:inputType="textPassword"
         android:ems="10"
-        android:id="@+id/passwordSignIn"
+        android:id="@+id/password"
         android:hint="Password"
-        android:textAlignment="center"
-        android:textColor="@color/colorWhite"
-        android:textColorHint="@color/colorWhite"
-        android:layout_marginTop="54dp"
+        android:layout_marginTop="25dp"
         android:layout_below="@+id/emailSignUp"
         android:layout_centerHorizontal="true"
-        android:textSize="20dp" />
+        android:textSize="20dp"
+        android:background="@color/colorWhite"
+        android:paddingLeft="10dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/comfirmPassword"
+        android:hint="Confirm Password"
+        android:textSize="20dp"
+        android:background="@color/colorWhite"
+        android:paddingLeft="10dp"
+        android:layout_below="@+id/password"
+        android:layout_alignLeft="@+id/password"
+        android:layout_alignStart="@+id/password"
+        android:layout_marginTop="25dp" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit"
-        android:id="@+id/submitSignUp"
-        android:layout_marginTop="72dp"
+        android:id="@+id/submitNewUser"
         android:background="@color/colorAccent"
         android:textColor="@color/colorWhite"
-        android:layout_below="@+id/passwordSignIn"
+        android:layout_marginBottom="65dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Already have an account? Log in here!"
+        android:id="@+id/loginView"
+        android:textSize="18dp"
+        android:textColor="@color/colorWhite"
+        android:layout_marginBottom="24dp"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
