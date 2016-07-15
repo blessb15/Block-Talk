@@ -55,6 +55,7 @@ public class UserActivity extends AppCompatActivity {
     private Double radius = 0.0003;
     private DatabaseReference mLocationMessagesReference;
     final ArrayList<LocationMessages> locationMessagesList = new ArrayList<>();
+    private ArrayList<String> keys = new ArrayList<>();
 
 
     @Override
@@ -70,9 +71,10 @@ public class UserActivity extends AppCompatActivity {
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+//                System.out.println("YO this is messages at first spot " + locationMessagesList.get(0).getMessages());
                 for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                    keys.add(locationSnapshot.getKey());
                     locationMessagesList.add(locationSnapshot.getValue(LocationMessages.class));
-                    System.out.println("YO this is messages at first spot " + locationMessagesList.get(0).getMessages());
                     for(int i = 0; i < locationMessagesList.size(); i++){
                         if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
                             ArrayAdapter adapter = new ArrayAdapter(stuff, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
@@ -97,16 +99,18 @@ public class UserActivity extends AppCompatActivity {
 //        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, );
 //        mMessagesView.setAdapter(adapter);
 
-        Timer timer = new Timer();
-        TimerTask myTask = new TimerTask() {
-            @Override
-            public void run() {
-                getLocationInfo();
-                System.out.println("location info refreshing...");
-            }
-        };
 
-        timer.schedule(myTask, 1*60*1000, 1*60*2000);
+        ///PUT TIMER BACK ON!!!!!!!!!!!!!!!!
+//        Timer timer = new Timer();
+//        TimerTask myTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                getLocationInfo();
+//                System.out.println("location info refreshing...");
+//            }
+//        };
+//
+//        timer.schedule(myTask, 1*60*1000, 1*60*2000);
 
         Intent intent = getIntent();
         final String username = intent.getStringExtra("username");
@@ -148,29 +152,40 @@ public class UserActivity extends AppCompatActivity {
                         for(int i = 0; i < locationMessagesList.size(); i++){
                             if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
                                 String newMessage = mUserMessage.getText().toString();
-                                LocationMessages newLocationMessages = locationMessagesList.get(i);
-                                newLocationMessages.getMessages().add(newMessage);
-                                locationMessagesRef.push().setValue(newLocationMessages);
+                                if(newMessage.length() > 0) {
+                                    LocationMessages newLocationMessage = locationMessagesList.get(i);
+                                    newLocationMessage.getMessages().add(newMessage);
+                                    Map<String, Object> newCrap = new HashMap<String, Object>();
+                                    newCrap.put("messages", newLocationMessage.getMessages());
+                                    locationMessagesRef.child(keys.get(i)).updateChildren(newCrap);
+                                    mUserMessage.setText("");
+                                }
                             } else {
                                 String newMessage = mUserMessage.getText().toString();
-                                List<String> messages = new ArrayList<>();
-                                messages.add(newMessage);
-                                LocationMessages locationMessages = new LocationMessages(userLocation, messages);
-                                mUserMessage.setText("");
-                                locationMessagesRef.push().setValue(locationMessages);
-                                System.out.println("YO new location with message");
+                                if(newMessage.length() > 0) {
+                                    List<String> messages = new ArrayList<>();
+                                    messages.add(newMessage);
+                                    LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+                                    mUserMessage.setText("");
+                                    locationMessagesRef.push().setValue(locationMessages);
+                                    System.out.println("YO new location with message");
+                                }
                             }
                         }
                     }
 
                     if (locationMessagesList.size() == 0) {
                         String newMessage = mUserMessage.getText().toString();
-                        List<String> messages = new ArrayList<>();
-                        messages.add(newMessage);
-                        LocationMessages locationMessages = new LocationMessages(userLocation, messages);
-                        mUserMessage.setText("");
-                        locationMessagesRef.push().setValue(locationMessages);
-                        System.out.println("YO first message");
+                        if(newMessage.length() > 0) {
+                            List<String> messages = new ArrayList<>();
+                            messages.add(newMessage);
+                            LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+                            mUserMessage.setText("");
+                            locationMessagesRef.push().setValue(locationMessages);
+                            System.out.println("YO first message");
+                            System.out.println("YO list of lm's " + locationMessagesList);
+                            System.out.println("YO list of lm keys " + keys);
+                        }
                     }
                 }
             }
