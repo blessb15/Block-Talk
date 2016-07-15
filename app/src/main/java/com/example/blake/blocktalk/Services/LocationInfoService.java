@@ -1,6 +1,8 @@
-package com.example.blake.blocktalk;
+package com.example.blake.blocktalk.Services;
 
-import com.example.blake.blocktalk.UserActivity;
+import com.example.blake.blocktalk.UI.UserActivity;
+import com.example.blake.blocktalk.Models.LocationInfo;
+import com.example.blake.blocktalk.*;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -18,22 +18,21 @@
         android:name="android.support.multidex.MultiDexApplication"
         android:theme="@style/AppTheme">
 
-        <activity android:name=".MainActivity" android:theme="@style/NoBar">
+        <activity android:name=".UI.MainActivity" android:theme="@style/NoBar" android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <activity android:name=".SignUpActivity">
+        <activity android:name=".SignUpActivity" android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.blake.blocktalk.MainActivity">
+                android:value="com.example.blake.blocktalk.UI.MainActivity">
             </meta-data>
         </activity>
 
-        <activity android:name=".UserActivity" android:label="@string/title_activity_user" android:theme="@style/NoBar" />
+        <activity android:name=".UI.UserActivity" android:label="@string/title_activity_user" android:theme="@style/NoBar" android:windowSoftInputMode="stateHidden"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

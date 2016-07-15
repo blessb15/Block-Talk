@@ -1,4 +1,4 @@
-package com.example.blake.blocktalk;
+package com.example.blake.blocktalk.Models;
 
 import java.util.ArrayList;
 import java.util.List;

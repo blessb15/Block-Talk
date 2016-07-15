@@ -1,4 +1,4 @@
-package com.example.blake.blocktalk;
+package com.example.blake.blocktalk.UI;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 
+import com.example.blake.blocktalk.R;
 import com.example.blake.blocktalk.SignUpActivity;
 
 import butterknife.Bind;

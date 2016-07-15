@@ -1,4 +1,4 @@
-package com.example.blake.blocktalk;
+package com.example.blake.blocktalk.Models;
 
 /**
  * Created by Blake on 7/14/2016.
