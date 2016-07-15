@@ -227,7 +227,13 @@ public class UserActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ///CREATING MARKER ON MAP OF USERS CURRENT LOCATION.
+                    ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
+                    for(int i = 0; i < locationMessagesList.size(); i++){
+                        if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
+                            ArrayAdapter adapter = new ArrayAdapter(UserActivity.this, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
+                            mMessagesView.setAdapter(adapter);
+                        }
+                    }
                     userLocation = new LatLng(userLat, userLong);
                 }
             });
@@ -235,6 +241,7 @@ public class UserActivity extends AppCompatActivity {
 
         @Override
         public void onStatusChanged(String s, int i, Bundle bundle) {
+
         }
 
         @Override

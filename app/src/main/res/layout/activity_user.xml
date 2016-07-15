@@ -17,14 +17,23 @@ tools:context="com.example.blake.blocktalk.UserActivity"
     <!--android:layout_height="200dp"-->
     <!--android:layout_below="@+id/GetUser" />-->
 
-<TextView
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imageView"
+        android:src="@drawable/talk"
+        android:translationZ="-1dp"
+        android:layout_centerInParent="true" />
+
+    <TextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/GetUser"
     android:textSize="20dp"
-    android:layout_alignParentTop="true"
-    android:layout_alignParentLeft="true"
-    android:layout_alignParentStart="true" />
+        android:hint="Hey, User!"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 <EditText
     android:layout_width="wrap_content"
@@ -40,7 +49,7 @@ tools:context="com.example.blake.blocktalk.UserActivity"
 
 <ListView
     android:layout_width="wrap_content"
-    android:layout_height="250dp"
+    android:layout_height="370dp"
     android:id="@+id/MessagesView"
     android:scrollIndicators="right"
     android:choiceMode="none"
@@ -65,9 +74,10 @@ tools:context="com.example.blake.blocktalk.UserActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/locationInfoText"
+        android:textColor="@color/colorBlack"
+        android:hint="Loading..."
         android:layout_alignBottom="@+id/GetUser"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:textColor="@color/colorBlack" />
+        android:layout_alignRight="@+id/MessagesView"
+        android:layout_alignEnd="@+id/MessagesView" />
 
 </RelativeLayout>
