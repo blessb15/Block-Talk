@@ -165,7 +165,7 @@ public class UserActivity extends AppCompatActivity {
                                     locationMessagesRef.child(keys.get(i)).updateChildren(update);
                                     mUserMessage.setText("");
                                     System.out.println("YO just added a message");
-                                } else {
+                                } else if (!((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
                                     List<String> messages = new ArrayList<>();
                                     messages.add(newMessage);
                                     LocationMessages locationMessages = new LocationMessages(userLocation, messages);
