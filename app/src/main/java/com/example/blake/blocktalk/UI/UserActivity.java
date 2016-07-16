@@ -103,16 +103,16 @@ public class UserActivity extends AppCompatActivity {
 
 
         ///TIMER TO REFRESH LOCATION INFO EVERY MINUTE
-//        Timer timer = new Timer();
-//        TimerTask myTask = new TimerTask() {
-//            @Override
-//            public void run() {
-//                getLocationInfo();
-//                System.out.println("location info refreshing...");
-//            }
-//        };
-//
-//        timer.schedule(myTask, 1*60*1000, 1*60*2000);
+        Timer timer = new Timer();
+        TimerTask myTask = new TimerTask() {
+            @Override
+            public void run() {
+                getLocationInfo();
+                System.out.println("location info refreshing...");
+            }
+        };
+
+        timer.schedule(myTask, 1*60*1000, 1*60*2000);
 
         ///GRAB STUFF FROM PREVIOUS PAGE SUBMIT
         Intent intent = getIntent();
@@ -160,10 +160,11 @@ public class UserActivity extends AppCompatActivity {
                                 if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
                                     LocationMessages newLocationMessage = locationMessagesList.get(i);
                                     newLocationMessage.getMessages().add(newMessage);
-                                    Map<String, Object> newCrap = new HashMap<String, Object>();
-                                    newCrap.put("messages", newLocationMessage.getMessages());
-                                    locationMessagesRef.child(keys.get(i)).updateChildren(newCrap);
+                                    Map<String, Object> update = new HashMap<String, Object>();
+                                    update.put("messages", newLocationMessage.getMessages());
+                                    locationMessagesRef.child(keys.get(i)).updateChildren(update);
                                     mUserMessage.setText("");
+                                    System.out.println("YO just added a message");
                                 } else {
                                     List<String> messages = new ArrayList<>();
                                     messages.add(newMessage);
@@ -181,9 +182,6 @@ public class UserActivity extends AppCompatActivity {
                             LocationMessages locationMessages = new LocationMessages(userLocation, messages);
                             mUserMessage.setText("");
                             locationMessagesRef.push().setValue(locationMessages);
-                            System.out.println("YO first message");
-                            System.out.println("YO list of lm's " + locationMessagesList);
-                            System.out.println("YO list of lm keys " + keys);
                         }
                     }
                 }
@@ -192,30 +190,30 @@ public class UserActivity extends AppCompatActivity {
     }
 
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.menu_main, menu);
-//        return super.onCreateOptionsMenu(menu);
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        int id = item.getItemId();
-//        if (id == R.id.action_logout) {
-//            logout();
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
-//
-//    private void logout(){
-//        FirebaseAuth.getInstance().signOut();
-//        Intent intent = new Intent(UserActivity.this, MainActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        startActivity(intent);
-//        finish();
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_logout) {
+            logout();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void logout(){
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(UserActivity.this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
 
     ///GRABING USERS LOCATION INFO FROM WEATHER UNDERGOROUND API
     private void getLocationInfo(){
