@@ -72,14 +72,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mAuth = FirebaseAuth.getInstance();
-        username = mAuth.getCurrentUser().getDisplayName();
+
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
 
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
                 if (user != null) {
+                    username = user.getDisplayName();
                     getSupportActionBar().setTitle("Hey, " + user.getDisplayName() + "!");
                 } else {
 

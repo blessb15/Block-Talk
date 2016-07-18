@@ -119,7 +119,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if(task.isSuccessful()) {
-                            Log.d("YO", user.getDisplayName());
                         }
                     }
                 });
