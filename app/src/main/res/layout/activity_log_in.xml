@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.blake.blocktalk.MainActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageView2"
+        android:src="@drawable/block4"
+        android:scaleType="centerCrop"
+        android:translationZ="0dp"
+        android:contentDescription="bg"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:accessibilityLiveRegion="polite" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign In"
+        android:textAlignment="center"
+        android:background="@color/colorAccent"
+        android:id="@+id/signIn"
+        android:textColor="@color/colorWhite"
+        android:layout_below="@+id/getPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Log In"
+        android:id="@+id/textView2"
+        android:textSize="37dp"
+        android:textColor="@color/colorWhite"
+        android:layout_alignParentTop="false"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="44dp"
+        android:translationZ="1dp"
+        android:layout_alignParentBottom="false" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:inputType="textEmailAddress"
+        android:ems="10"
+        android:id="@+id/getEmail"
+        android:hint="Email"
+        android:textSize="20dp"
+        android:layout_marginTop="50dp"
+        android:background="@color/colorWhite"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:paddingLeft="10dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/getPassword"
+        android:hint="Password"
+        android:textSize="20dp"
+        android:layout_marginTop="25dp"
+        android:autoText="true"
+        android:background="@color/colorWhite"
+        android:layout_below="@+id/getEmail"
+        android:layout_alignLeft="@+id/getEmail"
+        android:layout_alignStart="@+id/getEmail"
+        android:paddingLeft="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Don&apos;t have an account? Sign up here!"
+        android:id="@+id/signUp"
+        android:layout_marginTop="42dp"
+        android:layout_below="@+id/signIn"
+        android:layout_centerHorizontal="true"
+        android:textSize="18dp"
+        android:textColor="@color/colorWhite" />
+
+</RelativeLayout>
