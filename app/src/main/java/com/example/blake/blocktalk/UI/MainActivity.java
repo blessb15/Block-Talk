@@ -67,19 +67,18 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> keys = new ArrayList<>();
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private FirebaseUser user;
-
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mAuth = FirebaseAuth.getInstance();
+        username = mAuth.getCurrentUser().getDisplayName();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
 
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                user = firebaseAuth.getCurrentUser();
-                System.out.println("YO" + user.getDisplayName());
+                FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     getSupportActionBar().setTitle("Hey, " + user.getDisplayName() + "!");
                 } else {
@@ -90,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
 
-        ///REFRENCE TO MY DATABASE
+        ///REFRENCE TO DATABASE
         mLocationMessagesReference = FirebaseDatabase
                 .getInstance()
                 .getReference()
@@ -178,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                             for (int i = 0; i < locationMessagesList.size(); i++) {
                                 if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
                                     LocationMessages newLocationMessage = locationMessagesList.get(i);
-                                    newLocationMessage.getMessages().add(user + ": " + newMessage);
+                                    newLocationMessage.getMessages().add(username + ": " + newMessage);
                                     Map<String, Object> update = new HashMap<String, Object>();
                                     update.put("messages", newLocationMessage.getMessages());
                                     locationMessagesRef.child(keys.get(i)).updateChildren(update);
@@ -186,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                                     System.out.println("YO just added a message");
                                 } else if (!((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
                                     List<String> messages = new ArrayList<>();
-                                    messages.add(user + ": " + newMessage);
+                                    messages.add(username + ": " + newMessage);
                                     LocationMessages locationMessages = new LocationMessages(userLocation, messages);
                                     mUserMessage.setText("");
                                     locationMessagesRef.push().setValue(locationMessages);
@@ -197,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
 
                         if (locationMessagesList.size() == 0) {
                             List<String> messages = new ArrayList<>();
-                            messages.add(user + ": " + newMessage);
+                            messages.add(username + ": " + newMessage);
                             LocationMessages locationMessages = new LocationMessages(userLocation, messages);
                             mUserMessage.setText("");
                             locationMessagesRef.push().setValue(locationMessages);

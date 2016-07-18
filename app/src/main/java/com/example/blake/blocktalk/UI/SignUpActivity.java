@@ -51,19 +51,19 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        mAuth.addAuthStateListener(mAuthListener);
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        super.onStop();
+//        if (mAuthListener != null) {
+//            mAuth.removeAuthStateListener(mAuthListener);
+//        }
+//    }
 
     @Override
     public void onClick(View view){
@@ -88,7 +88,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         boolean validEmail = isValidEmail(email);
         boolean validPassword = isValidPassword(password,comfirmPassword);
         boolean validUsername = isValidUsername(mUsername);
-        if( !validEmail || validPassword || validUsername) return;
+        if( !validEmail || !validPassword || !validUsername) return;
 
         mAuthProgressDialog.show();
 
