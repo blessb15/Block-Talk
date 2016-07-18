@@ -28,7 +28,7 @@
         <activity android:name=".UI.SignUpActivity" android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.blake.blocktalk.UI.MainActivity">
+                android:value="com.example.blake.blocktalk.UI.LogInActivity">
             </meta-data>
         </activity>
 

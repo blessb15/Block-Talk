@@ -1,67 +1,212 @@
 package com.example.blake.blocktalk.UI;
 
+import com.example.blake.blocktalk.Models.*;
+import com.example.blake.blocktalk.*;
+import com.example.blake.blocktalk.Services.*;
+import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.blake.blocktalk.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+import com.example.blake.blocktalk.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
-    public static final String TAG = MainActivity.class.getSimpleName();
-
-    @Bind(R.id.signUp)
-    TextView mSignUp;
-    @Bind(R.id.signIn)
-    Button mSignIn;
-    @Bind(R.id.getEmail)
-    EditText mGetEmail;
-    @Bind(R.id.getPassword)
-    EditText mGetPassword;
-
+public class MainActivity extends AppCompatActivity {
+    @Bind(R.id.GetUser)
+    TextView mGetUser;
+    @Bind(R.id.MessagesView)
+    ListView mMessagesView;
+    @Bind(R.id.LocalMessage)
+    EditText mUserMessage;
+    @Bind(R.id.SubmitLocalMessage)
+    Button mSubmitLocalMessage;
+    @Bind(R.id.locationInfoText) TextView mLocationInfoText;
+    public ArrayList<LocationInfo> mLocationInfos = new ArrayList<LocationInfo>();
+    private LocationManager locationManager;
+    public static Double userLong;
+    public static Double userLat;
+    public static LatLng userLocation;
+    private Double radius = 0.0003;
+    private DatabaseReference mLocationMessagesReference;
+    final ArrayList<LocationMessages> locationMessagesList = new ArrayList<>();
+    private ArrayList<String> keys = new ArrayList<>();
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseUser user;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        ButterKnife.bind(this);
-
-        mSignIn.setOnClickListener(this);
-        mSignUp.setOnClickListener(this);
-
         mAuth = FirebaseAuth.getInstance();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
 
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                System.out.println("YO should be null " + user);
+                user = firebaseAuth.getCurrentUser();
+                System.out.println("YO" + user.getDisplayName());
                 if (user != null) {
-                    Intent intent = new Intent(MainActivity.this, UserActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
+                    getSupportActionBar().setTitle("Hey, " + user.getDisplayName() + "!");
+                } else {
+
                 }
             }
         };
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
+
+        ///REFRENCE TO MY DATABASE
+        mLocationMessagesReference = FirebaseDatabase
+                .getInstance()
+                .getReference()
+                .child(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
+        final Context stuff = this;
+        mLocationMessagesReference.addValueEventListener(new ValueEventListener() {
+
+            ///DATABASE STUFF, GRAB LOCATION MESSAGES, GRAB UNIQUE KEYS TO COMPARE.
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
+                    keys.add(locationSnapshot.getKey());
+                    locationMessagesList.add(locationSnapshot.getValue(LocationMessages.class));
+                    for(int i = 0; i < locationMessagesList.size(); i++){
+                        if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
+                            ArrayAdapter adapter = new ArrayAdapter(stuff, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
+                            mMessagesView.setAdapter(adapter);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_user);
+        ButterKnife.bind(this);
+
+
+        ///TIMER TO REFRESH LOCATION INFO EVERY MINUTE
+        Timer timer = new Timer();
+        TimerTask myTask = new TimerTask() {
+            @Override
+            public void run() {
+                getLocationInfo();
+                System.out.println("location info refreshing...");
+            }
+        };
+
+        timer.schedule(myTask, 1*60*1000, 1*60*2000);
+
+        ///GRAB STUFF FROM PREVIOUS PAGE SUBMIT
+        Intent intent = getIntent();
+        final String newMessage = intent.getStringExtra("message");
+
+        ///FIND USER LOCATION WITH PERMISSIONS
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+
+        ///SETS REFRESH ON USER LOCATION TO EVERY SECOND.
+        String provider = locationManager.getBestProvider(criteria, true);
+        if (provider != null) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.INTERNET}
+                            , 10);
+                }
+                return;
+            }
+            locationManager.requestLocationUpdates(provider, 1000, 0, listener);
+        }
+
+        ///LOCAL MESSAGE SUBMIT
+        mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (view == mSubmitLocalMessage) {
+                    DatabaseReference locationMessagesRef = FirebaseDatabase
+                            .getInstance()
+                            .getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
+
+                    String newMessage = mUserMessage.getText().toString();
+
+                    if (newMessage.length() > 0){
+                        if (locationMessagesList.size() >= 1) {
+                            for (int i = 0; i < locationMessagesList.size(); i++) {
+                                if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
+                                    LocationMessages newLocationMessage = locationMessagesList.get(i);
+                                    newLocationMessage.getMessages().add(user + ": " + newMessage);
+                                    Map<String, Object> update = new HashMap<String, Object>();
+                                    update.put("messages", newLocationMessage.getMessages());
+                                    locationMessagesRef.child(keys.get(i)).updateChildren(update);
+                                    mUserMessage.setText("");
+                                    System.out.println("YO just added a message");
+                                } else if (!((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
+                                    List<String> messages = new ArrayList<>();
+                                    messages.add(user + ": " + newMessage);
+                                    LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+                                    mUserMessage.setText("");
+                                    locationMessagesRef.push().setValue(locationMessages);
+                                    System.out.println("YO new location with message");
+                                }
+                            }
+                        }
+
+                        if (locationMessagesList.size() == 0) {
+                            List<String> messages = new ArrayList<>();
+                            messages.add(user + ": " + newMessage);
+                            LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+                            mUserMessage.setText("");
+                            locationMessagesRef.push().setValue(locationMessages);
+                            System.out.println("YO first location with message");
+                        }
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -78,46 +223,95 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void loginWithPassword(){
-        String email = mGetEmail.getText().toString().trim();
-        String password = mGetPassword.getText().toString().trim();
-
-        if (email.equals("")){
-            mGetEmail.setError("Field is empty");
-            return;
-        }
-        if (email.equals("")){
-            mGetPassword.setError("Field is empty");
-            return;
-        }
-
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-
-                        if(!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public void onClick(View view) {
-
-        if(view == mSignIn) {
-            loginWithPassword();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_logout) {
+            logout();
+            return true;
         }
-
-        if(view == mSignUp) {
-            Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
-            startActivity(intent);
-            finish();
-        }
+        return super.onOptionsItemSelected(item);
     }
 
+    private void logout(){
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(MainActivity.this, LogInActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    ///GRABING USERS LOCATION INFO FROM WEATHER UNDERGOROUND API
+    private void getLocationInfo(){
+        System.out.println("YO getLocationInfo");
+        final LocationInfoService locationService = new LocationInfoService();
+        locationService.getLocationInfo(new Callback() {
+
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response){
+                System.out.println("YO on response");
+                mLocationInfos = locationService.processResults(response);
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("YO on ui thread");
+                        for(int i = 0; i < mLocationInfos.size(); i++){
+                            mLocationInfoText.setText("Your current Location: " + mLocationInfos.get(i).getFullName());
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    ///LISTENER FROM DEVICES LOCATION. SETTING LAT AND LNG.
+    private final LocationListener listener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+
+            userLong = location.getLongitude();
+            userLat = location.getLatitude();
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
+                    for(int i = 0; i < locationMessagesList.size(); i++){
+                        if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
+                            ArrayAdapter adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
+                            mMessagesView.setAdapter(adapter);
+                        }
+                    }
+                    getLocationInfo();
+                    userLocation = new LatLng(userLat, userLong);
+                }
+            });
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+            userLocation = new LatLng(userLat, userLong);
+        }
+
+
+        @Override
+        public void onProviderDisabled(String s) {
+        }
+    };
 }

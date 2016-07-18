@@ -1,6 +1,6 @@
 package com.example.blake.blocktalk.Services;
 
-import com.example.blake.blocktalk.UI.UserActivity;
+import com.example.blake.blocktalk.UI.MainActivity;
 import com.example.blake.blocktalk.Models.LocationInfo;
 import com.example.blake.blocktalk.*;
 
@@ -31,7 +31,7 @@ public class LocationInfoService {
 
 
         Request request = new Request.Builder()
-                .url("http://api.wunderground.com/api/" + Constants.key + "/geolookup/q/" + UserActivity.userLat + "," + UserActivity.userLong + ".json")
+                .url("http://api.wunderground.com/api/" + Constants.key + "/geolookup/q/" + MainActivity.userLat + "," + MainActivity.userLong + ".json")
                 .post(postData)
                 .build();
 
