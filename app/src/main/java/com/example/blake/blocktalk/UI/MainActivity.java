@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     public static Double userLong;
     public static Double userLat;
     public static LatLng userLocation;
-    private Double radius = 0.0010;
+    private Double radius = 0.0005;
     private DatabaseReference mLocationMessagesReference;
     final ArrayList<LocationMessages> locationMessagesList = new ArrayList<>();
     private ArrayList<String> keys = new ArrayList<>();
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                     String newMessage = mUserMessage.getText().toString();
 
                     ///LOCAL MESSAGE SUBMIT
-                    if (newMessage.length() > 0) {
+                    if (newMessage.length() > 0 && newLocationText.length() == 0) {
                         if (locationMessagesList.size() >= 1) {
                             for (int i = 0; i < locationMessagesList.size(); i++) {
                                 if (((locationMessagesList.get(i).getLatLng().latitude() + radius) > userLocation.latitude() && userLocation.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > userLocation.longitude() && userLocation.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
@@ -222,8 +222,24 @@ public class MainActivity extends AppCompatActivity {
                                 update.put("messages", newLocationMessage.getMessages());
                                 locationMessagesRef.child(keys.get(i)).updateChildren(update);
                                 mUserMessage.setText("");
-                                System.out.println("YO just added a message");
+                                System.out.println("YO just added a message2");
+                            } else if (!((locationMessagesList.get(i).getLatLng().latitude() + radius) > newLatLng.latitude() && newLatLng.latitude() > (locationMessagesList.get(i).getLatLng().latitude() - radius)) && ((locationMessagesList.get(i).getLatLng().longitude() + radius) > newLatLng.longitude() && newLatLng.longitude() > (locationMessagesList.get(i).getLatLng().longitude() - radius))) {
+                                List<String> messages = new ArrayList<>();
+                                messages.add(username + ": " + newMessage);
+                                LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+                                mUserMessage.setText("");
+                                locationMessagesRef.push().setValue(locationMessages);
+                                System.out.println("YO new location with message");
                             }
+                        }
+
+                        if (locationMessagesList.size() == 0) {
+                            List<String> messages = new ArrayList<>();
+                            messages.add(username + ": " + newMessage);
+                            LocationMessages locationMessages = new LocationMessages(newLatLng, messages);
+                            mUserMessage.setText("");
+                            locationMessagesRef.push().setValue(locationMessages);
+                            System.out.println("YO first location with message");
                         }
                     }
                 }
