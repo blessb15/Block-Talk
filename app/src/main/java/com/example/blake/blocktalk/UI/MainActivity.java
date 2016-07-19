@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     public static Double userLong;
     public static Double userLat;
     public static LatLng userLocation;
-    private Double radius = 0.0005;
+    private Double radius = 0.0010;
     private DatabaseReference mLocationMessagesReference;
     final ArrayList<LocationMessages> locationMessagesList = new ArrayList<>();
     private ArrayList<String> keys = new ArrayList<>();
