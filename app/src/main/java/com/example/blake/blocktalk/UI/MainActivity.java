@@ -2,7 +2,6 @@ package com.example.blake.blocktalk.UI;
 
 import com.example.blake.blocktalk.Models.*;
 import com.example.blake.blocktalk.*;
-import com.example.blake.blocktalk.Services.*;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +16,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,14 +28,9 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
 import com.example.blake.blocktalk.R;
-import com.google.android.gms.vision.barcode.Barcode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -43,12 +39,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
     @Bind(R.id.newLocation)
@@ -60,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.SubmitLocalMessage)
     Button mSubmitLocalMessage;
     @Bind(R.id.locationInfoText) TextView mLocationInfoText;
-    public ArrayList<LocationInfo> mLocationInfos = new ArrayList<LocationInfo>();
     private LocationManager locationManager;
     public static Double userLong;
     public static Double userLat;
@@ -77,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         mAuth = FirebaseAuth.getInstance();
 
-
         mAuthListener = new FirebaseAuth.AuthStateListener() {
 
             @Override
@@ -92,8 +88,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
 
         ///REFRENCE TO DATABASE
         mLocationMessagesReference = FirebaseDatabase
@@ -127,19 +121,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-
-        ///TIMER TO REFRESH LOCATION INFO EVERY MINUTE
-        Timer timer = new Timer();
-        TimerTask myTask = new TimerTask() {
-            @Override
-            public void run() {
-                getLocationInfo();
-                System.out.println("location info refreshing...");
-            }
-        };
-
-        timer.schedule(myTask, 1 * 60 * 1000, 1 * 60 * 2000);
 
         ///GRAB STUFF FROM PREVIOUS PAGE SUBMIT
         Intent intent = getIntent();
@@ -234,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    ///CHECKS FOR LOCATION MESSAGES AROUND WHERE YOUR SENDING TO KEEP FROM DUPLICATION
     public boolean checkForNearbyLMS(ArrayList<LocationMessages> lms, LatLng loc) {
         boolean checkforlms = false;
         int num = 0;
@@ -248,11 +230,11 @@ public class MainActivity extends AppCompatActivity {
         return checkforlms;
     }
 
+    ///GRABS LOCATION THAT USER PROVIDES AND CONVERTS TO LATLNG
     public LatLng getNewUserLocation(String newLocation){
         Geocoder coder = new Geocoder(MainActivity.this);
         List<Address> address;
 
-        Barcode.GeoPoint p1 = null;
         List<LatLng> stuff = new ArrayList<LatLng>();
         LatLng newLatLng;
 
@@ -271,6 +253,19 @@ public class MainActivity extends AppCompatActivity {
         return stuff.get(0);
     }
 
+    public void getLocationInfo() {
+        Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
+
+        try {
+            List<Address> address = geocoder.getFromLocation(userLat, userLong, 1);
+            Address userLocationInfo = address.get(0);
+            System.out.println("YO" + userLocationInfo.toString());
+            mLocationInfoText.setText("Your current address: " + userLocationInfo.getAddressLine(0));
+        } catch (IOException e) {
+            Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -285,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    ///CREATES LOG OUT OPTION
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -310,37 +306,13 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    ///GRABING USERS LOCATION INFO FROM WEATHER UNDERGOROUND API
-    private void getLocationInfo(){
-        final LocationInfoService locationService = new LocationInfoService();
-        locationService.getLocationInfo(new Callback() {
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(Call call, Response response){
-                mLocationInfos = locationService.processResults(response);
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for(int i = 0; i < mLocationInfos.size(); i++){
-                            mLocationInfoText.setText("Your current Location: " + mLocationInfos.get(i).getFullName());
-                        }
-                    }
-                });
-            }
-        });
-    }
-
     ///LISTENER FROM DEVICES LOCATION. SETTING LAT AND LNG.
     private final LocationListener listener = new LocationListener() {
         public void onLocationChanged(Location location) {
 
             userLong = location.getLongitude();
             userLat = location.getLatitude();
+
 
             runOnUiThread(new Runnable() {
                 @Override
@@ -352,8 +324,8 @@ public class MainActivity extends AppCompatActivity {
                             mMessagesView.setAdapter(adapter);
                         }
                     }
-//                    getLocationInfo();
                     userLocation = new LatLng(userLat, userLong);
+                    getLocationInfo();
                 }
             });
         }

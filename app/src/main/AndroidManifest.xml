@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.blake.blocktalk" android:versionCode="2" android:versionName="1.0.1"
-    android:installLocation="auto">
+    package="com.example.blake.blocktalk">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -26,22 +25,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".UI.SignUpActivity" android:windowSoftInputMode="stateHidden">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".UI.LogInActivity">
-            </meta-data>
-        </activity>
+        <activity android:name=".UI.SignUpActivity" android:windowSoftInputMode="stateHidden"/>
 
         <activity android:name=".UI.MainActivity" android:windowSoftInputMode="stateHidden"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
 
     </application>
 

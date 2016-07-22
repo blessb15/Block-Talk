@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/GetUser"
-        android:textSize="20dp"
+        android:textSize="15dp"
         android:hint="Hey, User!"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -30,7 +30,9 @@
         android:inputType="textCapSentences|textAutoCorrect"
         android:imeOptions="actionSend"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/colorPrimary"
+        android:breakStrategy="simple" />
 
     <ListView
         android:layout_width="wrap_content"
@@ -75,6 +77,8 @@
         android:imeOptions="actionSend"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:backgroundTint="@color/colorPrimary"
+        android:breakStrategy="simple" />
 
 </RelativeLayout>

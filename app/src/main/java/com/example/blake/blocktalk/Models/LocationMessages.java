@@ -1,6 +1,10 @@
 package com.example.blake.blocktalk.Models;
 
+import com.google.firebase.auth.FirebaseAuth;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +28,5 @@ public class LocationMessages {
     public List<String> getMessages(){
         return this.messages;
     }
-
 
 }
