@@ -257,7 +257,8 @@ public class MainActivity extends AppCompatActivity {
         LatLng newLatLng;
 
         try {
-            address = coder.getFromLocationName(newLocation, 1);
+            address = coder.getFromLocationName(newLocation, 5);
+            System.out.println("YO " + address);
             if (address == null) {
                 Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
             }
