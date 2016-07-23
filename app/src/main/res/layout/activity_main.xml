@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".UI.MainActivity"
-        android:background="@color/colorWhite">
+        android:background="#fff5ef">
 
     <TextView
         android:layout_width="wrap_content"
@@ -22,32 +22,38 @@
         android:text="Messages on your block:" />
 
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="175dp"
+        android:layout_height="40dp"
         android:id="@+id/LocalMessage"
-        android:hint="Send Message"
-        android:textAlignment="center"
+        android:hint="Send Message  "
+        android:textAlignment="textStart"
         android:inputType="textCapSentences|textAutoCorrect"
         android:imeOptions="actionSend"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:backgroundTint="@color/colorPrimary"
-        android:breakStrategy="simple" />
+        android:breakStrategy="simple"
+        android:background="@drawable/edit_text_round"
+        android:layout_alignTop="@+id/newLocation"
+        android:layout_toLeftOf="@+id/locationInfoText"
+        android:layout_toStartOf="@+id/locationInfoText"
+        android:shape="rectangle"
+        android:paddingEnd="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp" />
 
     <ListView
         android:layout_width="wrap_content"
-        android:layout_height="370dp"
+        android:layout_height="344dp"
         android:id="@+id/MessagesView"
         android:scrollIndicators="right"
         android:choiceMode="none"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_above="@+id/LocalMessage"
-        android:layout_below="@+id/GetUser" />
+        android:layout_below="@+id/GetUser"/>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="100dp"
         android:text="Send"
         android:id="@+id/SubmitLocalMessage"
         android:background="@color/colorAccent"
@@ -68,17 +74,21 @@
         android:layout_alignEnd="@+id/MessagesView" />
 
     <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="105dp"
+        android:layout_height="40dp"
         android:id="@+id/newLocation"
-        android:hint="Location"
-        android:textAlignment="center"
+        android:hint="Address"
+        android:textAlignment="textStart"
         android:inputType="textCapSentences|textAutoCorrect"
         android:imeOptions="actionSend"
+        android:breakStrategy="simple"
+        android:background="@drawable/edit_text_round"
+        android:autoText="false"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:backgroundTint="@color/colorPrimary"
-        android:breakStrategy="simple" />
+        android:paddingEnd="10dp"
+        android:paddingStart="10dp" />
+
 
 </RelativeLayout>
