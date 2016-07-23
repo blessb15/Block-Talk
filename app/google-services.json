@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:52783457348:android:c9c82b8eb43e1712",
         "android_client_info": {
-          "package_name": "com.example.blake.blocktalk"
+          "package_name": "com.bless.blake.blocktalk"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "52783457348-72cl5sqjcvl19ijgrqoufe42g1h33ti8.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.blake.blocktalk",
+            "package_name": "com.bless.blake.blocktalk",
             "certificate_hash": "BCE2CC3289792F6E6753A10A2BD6B63A841EA5D7"
           }
         },

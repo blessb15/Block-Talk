@@ -1,4 +1,4 @@
-package com.example.blake.blocktalk;
+package com.bless.blake.blocktalk;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

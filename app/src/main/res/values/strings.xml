@@ -2,7 +2,6 @@
     <string name="app_name">BlockTalk</string>
     <string name="title_activity_user">Map</string>
     <string name="bt">BT</string>
-    <string name="weather_key" templateMergeStrategy="preserve" translatable="false">
-        7ef0e77df5b9d3c3
-    </string>
+    <string name="action_settings">Settings</string>
+    <string name="banner_ad_unit_id">ca-app-pub-2042853654178767/9191400535</string>
 </resources>

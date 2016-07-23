@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.blake.blocktalk.SignUpActivity">
+    tools:context="com.bless.blake.blocktalk.SignUpActivity">
 
     <ImageView
         android:layout_width="match_parent"
