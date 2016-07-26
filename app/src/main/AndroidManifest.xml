@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.bless.blake.blocktalk.UI.LogInActivity"
+            android:name=".UI.LogInActivity"
             android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,15 +24,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.bless.blake.blocktalk.UI.SignUpActivity"
+            android:name=".UI.SignUpActivity"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name="com.bless.blake.blocktalk.UI.MainActivity"
+            android:name=".UI.MainActivity"
             android:windowSoftInputMode="stateHidden" />
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
 
     </application>
 

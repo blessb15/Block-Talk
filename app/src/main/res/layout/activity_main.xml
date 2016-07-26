@@ -7,17 +7,6 @@
     tools:context=".UI.MainActivity"
         android:background="#fff5ef">
 
-    <com.google.android.gms.ads.AdView
-        android:paddingTop="0dp"
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true">
-    </com.google.android.gms.ads.AdView>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,7 +14,9 @@
         android:paddingRight="15dp"
         android:paddingLeft="15dp"
         android:paddingBottom="10dp"
-        android:layout_below="@+id/adView">
+        android:paddingTop="15dp"
+        android:id="@+id/relativeLayout"
+        android:layout_below="@+id/map">
 
         <ListView
             android:layout_width="wrap_content"
@@ -33,10 +24,10 @@
             android:id="@+id/MessagesView"
             android:scrollIndicators="right"
             android:choiceMode="none"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_above="@+id/LocalMessage"
-            android:layout_below="@+id/locationInfoText" />
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_above="@+id/SubmitLocalMessage"
+            android:layout_below="@+id/GetUser" />
 
         <Button
             android:layout_width="50dp"
@@ -52,8 +43,8 @@
             android:layout_gravity="right" />
 
         <EditText
-            android:layout_width="105dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/newLocation"
             android:hint="Address"
             android:textAlignment="textStart"
@@ -66,21 +57,13 @@
             android:paddingStart="10dp"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/locationInfoText"
-            android:textColor="@color/colorBlack"
-            android:hint="Loading..."
-            android:layout_alignBottom="@+id/GetUser"
-            android:layout_alignRight="@+id/MessagesView"
-            android:layout_alignEnd="@+id/MessagesView" />
+            android:layout_alignParentStart="true"
+            android:minHeight="30dp"
+            android:maxWidth="200dp" />
 
         <EditText
-            android:layout_width="175dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/LocalMessage"
             android:hint="Send Message  "
             android:textAlignment="textStart"
@@ -94,8 +77,12 @@
             android:paddingTop="3dp"
             android:paddingBottom="3dp"
             android:layout_alignTop="@+id/newLocation"
-            android:layout_toLeftOf="@+id/locationInfoText"
-            android:layout_toStartOf="@+id/locationInfoText" />
+            android:layout_toLeftOf="@+id/SubmitLocalMessage"
+            android:layout_toStartOf="@+id/SubmitLocalMessage"
+            android:layout_marginRight="29dp"
+            android:layout_marginEnd="29dp"
+            android:minHeight="30dp"
+            android:maxWidth="200dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -104,9 +91,33 @@
             android:textSize="15dp"
             android:hint="Hey, User!"
             android:text="Messages on your block:"
-            android:layout_alignLeft="@+id/MessagesView"
-            android:layout_alignStart="@+id/MessagesView" />
+            android:layout_below="@+id/map"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
     </RelativeLayout>
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        tools:context="com.bless.blake.blocktalk.MapsActivity"
+        android:layout_alignRight="@+id/MessagesView"
+        android:layout_alignEnd="@+id/MessagesView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/locationInfoText"
+        android:textColor="@color/colorBlack"
+        android:hint="Loading..."
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textColorHint="@color/colorBlack" />
 
 
 </RelativeLayout>

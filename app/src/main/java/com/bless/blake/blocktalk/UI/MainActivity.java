@@ -5,6 +5,7 @@ import com.bless.blake.blocktalk.*;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -28,10 +29,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import com.bless.blake.blocktalk.Models.LatLng;
 import com.bless.blake.blocktalk.R;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.*;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -46,7 +49,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     @Bind(R.id.newLocation)
     EditText mNewLocation;
     @Bind(R.id.MessagesView)
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String username;
+    private GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,11 +105,21 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
                     keys.add(locationSnapshot.getKey());
                     locationMessagesList.add(locationSnapshot.getValue(LocationMessages.class));
-                    for (int i = 0; i < locationMessagesList.size(); i++) {
-                        if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
-                            ArrayAdapter adapter = new ArrayAdapter(stuff, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
-                            mMessagesView.setAdapter(adapter);
+                    if (locationMessagesList.size() > 0) {
+                        for (LocationMessages lm : locationMessagesList) {
+                            com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(lm.getLatLng().latitude(), lm.getLatLng().longitude());
+                            mMap.addMarker(new MarkerOptions().position(newlatlng).title("There is " + lm.getMessages().size() + " message(s) at " + getLocationInfo(lm.getLatLng().latitude(), lm.getLatLng().longitude())));
                         }
+                    }
+                    if (userLocation != null) {
+                        for (int i = 0; i < locationMessagesList.size(); i++) {
+                            if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
+                                ArrayAdapter adapter = new ArrayAdapter(stuff, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
+                                mMessagesView.setAdapter(adapter);
+                            }
+                        }
+                    } else {
+                        Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -120,10 +134,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        MobileAds.initialize(getApplicationContext(), "ca-app-pub-2042853654178767~4761200934");
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        ///MAP INSTANTIATION
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         ///GRAB STUFF FROM PREVIOUS PAGE SUBMIT
         Intent intent = getIntent();
@@ -164,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                     String newMessage = mUserMessage.getText().toString();
 
                     ///LOCAL MESSAGE SUBMIT
-                    if (newMessage.length() > 0 && newLocationText.length() == 0) {
+                    if (newMessage.length() > 0 && newLocationText.length() == 0 && userLocation != null) {
                         if(checkForNearbyLMS(locationMessagesList, userLocation) == true){
                             List<String> messages = new ArrayList<>();
                             messages.add(username + ": " + newMessage);
@@ -252,16 +265,19 @@ public class MainActivity extends AppCompatActivity {
         return stuff.get(0);
     }
 
-    public void getLocationInfo() {
+    public String getLocationInfo(double userLat, double userLong) {
         Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
-
+        ArrayList stuff = new ArrayList();
+        String location;
         try {
-            List<Address> address = geocoder.getFromLocation(userLat, userLong, 1);
+            List<Address> address = geocoder.getFromLocation(userLat, userLong, 5);
             Address userLocationInfo = address.get(0);
-            mLocationInfoText.setText("Your current address: " + userLocationInfo.getAddressLine(0));
+            stuff.add(userLocationInfo.getAddressLine(0).toString());
         } catch (IOException e) {
             Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
         }
+        return location = stuff.get(0).toString();
+
     }
 
     @Override
@@ -317,13 +333,24 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
                     for(int i = 0; i < locationMessagesList.size(); i++){
-                        if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
-                            ArrayAdapter adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
-                            mMessagesView.setAdapter(adapter);
+                        if(userLocation != null) {
+                            Circle userRadius = mMap.addCircle(new CircleOptions()
+                                    .center(new com.google.android.gms.maps.model.LatLng(userLat, userLong))
+                                    .radius(80)
+                                    .strokeColor(Color.BLUE)
+                                    .fillColor(Color.BLUE));
+                            mLocationInfoText.setText("Your current address: " + getLocationInfo(userLat, userLong));
+                            if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
+                                ArrayAdapter adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
+                                mMessagesView.setAdapter(adapter);
+                            }
+                        } else {
+                            Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
+
                         }
                     }
                     userLocation = new LatLng(userLat, userLong);
-                    getLocationInfo();
+                    getLocationInfo(userLat, userLong);
                 }
             });
         }
@@ -343,4 +370,9 @@ public class MainActivity extends AppCompatActivity {
         public void onProviderDisabled(String s) {
         }
     };
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
+    }
 }
