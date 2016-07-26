@@ -27,13 +27,13 @@
         android:textColor="@color/colorWhite"
         android:layout_below="@+id/getPassword"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="45dp" />
+        android:layout_marginTop="35dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Log In"
-        android:id="@+id/textView2"
+        android:id="@+id/loginHeader"
         android:textSize="37dp"
         android:textColor="@color/colorWhite"
         android:layout_alignParentTop="false"
@@ -52,7 +52,7 @@
         android:textSize="20dp"
         android:layout_marginTop="50dp"
         android:background="@color/colorWhite"
-        android:layout_below="@+id/textView2"
+        android:layout_below="@+id/loginHeader"
         android:layout_centerHorizontal="true"
         android:paddingLeft="10dp" />
 
@@ -77,7 +77,7 @@
         android:layout_height="wrap_content"
         android:text="Don&apos;t have an account? Sign up here!"
         android:id="@+id/signUp"
-        android:layout_marginTop="42dp"
+        android:layout_marginTop="18dp"
         android:layout_below="@+id/signIn"
         android:layout_centerHorizontal="true"
         android:textSize="18dp"

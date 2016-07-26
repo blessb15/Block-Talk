@@ -24,7 +24,7 @@
         android:layout_centerHorizontal="true"
         android:textColor="@color/colorWhite"
         android:textColorHint="@color/colorWhite"
-        android:id="@+id/textView3" />
+        android:id="@+id/signUpHeader" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -33,7 +33,7 @@
         android:autoText="false"
         android:hint="Username"
         android:layout_marginTop="50dp"
-        android:layout_below="@+id/textView3"
+        android:layout_below="@+id/signUpHeader"
         android:textSize="20dp"
         android:background="@color/colorWhite"
         android:layout_alignLeft="@+id/emailSignUp"
@@ -93,8 +93,8 @@
         android:id="@+id/submitNewUser"
         android:background="@color/colorAccent"
         android:textColor="@color/colorWhite"
-        android:layout_marginBottom="65dp"
-        android:layout_alignParentBottom="true"
+        android:layout_marginTop="35dp"
+        android:layout_below="@+id/comfirmPassword"
         android:layout_centerHorizontal="true" />
 
     <TextView
@@ -104,8 +104,8 @@
         android:id="@+id/loginView"
         android:textSize="18dp"
         android:textColor="@color/colorWhite"
-        android:layout_marginBottom="24dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/submitNewUser"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp" />
 
 </RelativeLayout>

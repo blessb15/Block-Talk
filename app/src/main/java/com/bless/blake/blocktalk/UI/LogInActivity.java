@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
 
 public class LogInActivity extends AppCompatActivity implements View.OnClickListener{
     public static final String TAG = LogInActivity.class.getSimpleName();
-
+    @Bind(R.id.loginHeader) TextView mLogInHeader;
     @Bind(R.id.signUp)
     TextView mSignUp;
     @Bind(R.id.signIn)
@@ -45,6 +45,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         ButterKnife.bind(this);
 
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
+        mSignUp.setTypeface(font);
         mSignUp.setTypeface(font);
 
         mSignIn.setOnClickListener(this);
@@ -96,16 +97,15 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         }
 
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithEmail", task.getException());
-                            Toast.makeText(LogInActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(!task.isSuccessful()) {
+                    Log.w(TAG, "signInWithEmail", task.getException());
+                    Toast.makeText(LogInActivity.this, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void createProgressDialogue(){

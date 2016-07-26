@@ -2,11 +2,9 @@ package com.bless.blake.blocktalk.UI;
 
 import com.bless.blake.blocktalk.Models.*;
 import com.bless.blake.blocktalk.*;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Criteria;
@@ -29,10 +27,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
-
 import com.bless.blake.blocktalk.Models.LatLng;
 import com.bless.blake.blocktalk.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -47,7 +43,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +50,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
     @Bind(R.id.newLocation)
     EditText mNewLocation;
     @Bind(R.id.MessagesView)
@@ -80,10 +75,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String username;
     private GoogleMap mMap;
-    private Circle userRadius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        ///SETTING VIEW AND BINDING ID'S
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        ///SETS FONT
+        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
+        mUserMessage.setTypeface(font);
+        mLocationInfoText.setTypeface(font);
+        mBlockMessage.setTypeface(font);
+
+        ///MAP INSTANTIATION
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        ///GRAB STUFF FROM PREVIOUS PAGE SUBMIT
+        Intent intent = getIntent();
+        final String newMessage = intent.getStringExtra("message");
+
         mAuth = FirebaseAuth.getInstance();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -115,22 +129,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
                     keys.add(locationSnapshot.getKey());
                     locationMessagesList.add(locationSnapshot.getValue(LocationMessages.class));
-                    if (locationMessagesList.size() > 0) {
-                        for (LocationMessages lm : locationMessagesList) {
-                            com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(lm.getLatLng().latitude(), lm.getLatLng().longitude());
-                            mMap.addMarker(new MarkerOptions().position(newlatlng).title("There is " + lm.getMessages().size() + " message(s) at " + getLocationInfo(lm.getLatLng().latitude(), lm.getLatLng().longitude())));
-                        }
-                    }
-                    if (userLocation != null) {
-                        for (int i = 0; i < locationMessagesList.size(); i++) {
-                            if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
-                                ArrayAdapter adapter = new ArrayAdapter(stuff, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
-                                mMessagesView.setAdapter(adapter);
-                            }
-                        }
-                    } else {
-                        Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
-                    }
+                    getMessagesNearby();
                 }
             }
 
@@ -140,25 +139,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-
-        ///SETS FONT
-        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
-        mUserMessage.setTypeface(font);
-        mLocationInfoText.setTypeface(font);
-        mBlockMessage.setTypeface(font);
-
-        ///MAP INSTANTIATION
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        ///GRAB STUFF FROM PREVIOUS PAGE SUBMIT
-        Intent intent = getIntent();
-        final String newMessage = intent.getStringExtra("message");
-
         ///FIND USER LOCATION WITH PERMISSIONS
+        refreshLocation();
+
+        mSubmitLocalMessage.setOnClickListener(this);
+    }
+
+    public void refreshLocation() {
+        ///SETS CRITERIA FOR WANTED CONNECTION
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -177,70 +165,66 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 return;
             }
-            locationManager.requestLocationUpdates(provider, 1000, 0, listener);
+            locationManager.requestLocationUpdates(provider, 100000, 0, listener);
         }
+    }
 
-        ///SENDING MESSAGES
-        mSubmitLocalMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (view == mSubmitLocalMessage) {
-                    DatabaseReference locationMessagesRef = FirebaseDatabase
-                            .getInstance()
-                            .getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
+    public void onClick(View view) {
+        if (view == mSubmitLocalMessage) {
+            DatabaseReference locationMessagesRef = FirebaseDatabase
+                    .getInstance()
+                    .getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
 
-                    String newLocationText = mNewLocation.getText().toString();
-                    String newMessage = mUserMessage.getText().toString();
+            String newLocationText = mNewLocation.getText().toString();
+            String newMessage = mUserMessage.getText().toString();
 
-                    ///LOCAL MESSAGE SUBMIT
-                    if (newMessage.length() > 0 && newLocationText.length() == 0 && userLocation != null) {
-                        if (checkForNearbyLMS(locationMessagesList, userLocation) == true) {
-                            List<String> messages = new ArrayList<>();
-                            messages.add(username + ": " + newMessage);
-                            LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+            ///LOCAL MESSAGE SUBMIT
+            if (newMessage.length() > 0 && newLocationText.length() == 0 && userLocation != null) {
+                if (checkForNearbyLMS(locationMessagesList, userLocation) == true) {
+                    List<String> messages = new ArrayList<>();
+                    messages.add(username + ": " + newMessage);
+                    LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+                    mUserMessage.setText("");
+                    locationMessagesRef.push().setValue(locationMessages);
+                }
+                if (locationMessagesList.size() >= 1) {
+                    for (int i = 0; i < locationMessagesList.size(); i++) {
+                        if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
+                            LocationMessages newLocationMessage = locationMessagesList.get(i);
+                            newLocationMessage.getMessages().add(username + ": " + newMessage);
+                            Map<String, Object> update = new HashMap<String, Object>();
+                            update.put("messages", newLocationMessage.getMessages());
+                            locationMessagesRef.child(keys.get(i)).updateChildren(update);
                             mUserMessage.setText("");
-                            locationMessagesRef.push().setValue(locationMessages);
-                        }
-                        if (locationMessagesList.size() >= 1) {
-                            for (int i = 0; i < locationMessagesList.size(); i++) {
-                                if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
-                                    LocationMessages newLocationMessage = locationMessagesList.get(i);
-                                    newLocationMessage.getMessages().add(username + ": " + newMessage);
-                                    Map<String, Object> update = new HashMap<String, Object>();
-                                    update.put("messages", newLocationMessage.getMessages());
-                                    locationMessagesRef.child(keys.get(i)).updateChildren(update);
-                                    mUserMessage.setText("");
-                                }
-                            }
-                        }
-                    }
-
-                    ///SEND MESSAGE TO NEW LOCATION
-                    if (newLocationText.length() > 0 && newMessage.length() > 0) {
-                        LatLng newLatLng = getNewUserLocation(newLocationText);
-                        if (checkForNearbyLMS(locationMessagesList, newLatLng) == true) {
-                            List<String> messages = new ArrayList<>();
-                            messages.add(username + ": " + newMessage);
-                            LocationMessages locationMessages = new LocationMessages(newLatLng, messages);
-                            mUserMessage.setText("");
-                            locationMessagesRef.push().setValue(locationMessages);
-                            Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
-                        }
-                        for (int i = 0; i < locationMessagesList.size(); i++) {
-                            if (locationMessagesList.get(i).getLatLng().latitude() <= (newLatLng.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (newLatLng.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (newLatLng.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (newLatLng.longitude() - radius)) {
-                                LocationMessages newLocationMessage = locationMessagesList.get(i);
-                                newLocationMessage.getMessages().add(username + ": " + newMessage);
-                                Map<String, Object> update = new HashMap<String, Object>();
-                                update.put("messages", newLocationMessage.getMessages());
-                                locationMessagesRef.child(keys.get(i)).updateChildren(update);
-                                mUserMessage.setText("");
-                                Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
-                            }
                         }
                     }
                 }
             }
-        });
+
+            ///SEND MESSAGE TO NEW LOCATION
+            if (newLocationText.length() > 0 && newMessage.length() > 0) {
+                LatLng newLatLng = getNewUserLocation(newLocationText);
+                if (checkForNearbyLMS(locationMessagesList, newLatLng) == true) {
+                    List<String> messages = new ArrayList<>();
+                    messages.add(username + ": " + newMessage);
+                    LocationMessages locationMessages = new LocationMessages(newLatLng, messages);
+                    mUserMessage.setText("");
+                    locationMessagesRef.push().setValue(locationMessages);
+                    Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
+                }
+                for (int i = 0; i < locationMessagesList.size(); i++) {
+                    if (locationMessagesList.get(i).getLatLng().latitude() <= (newLatLng.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (newLatLng.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (newLatLng.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (newLatLng.longitude() - radius)) {
+                        LocationMessages newLocationMessage = locationMessagesList.get(i);
+                        newLocationMessage.getMessages().add(username + ": " + newMessage);
+                        Map<String, Object> update = new HashMap<String, Object>();
+                        update.put("messages", newLocationMessage.getMessages());
+                        locationMessagesRef.child(keys.get(i)).updateChildren(update);
+                        mUserMessage.setText("");
+                        Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
     }
 
     ///CHECKS FOR LOCATION MESSAGES AROUND WHERE YOUR SENDING TO KEEP FROM DUPLICATION
@@ -282,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     ///RETURNS STRING OF CURRENT LOCATION
-    public String getLocationInfo(double userLat, double userLong) {
+    public String getLocationAddress(double userLat, double userLong) {
         Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
         ArrayList stuff = new ArrayList();
         String location;
@@ -301,84 +285,53 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return location;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
+    public void markMessages() {
+        if(locationMessagesList.size() > 0) {
+            for (LocationMessages lm : locationMessagesList) {
+                int lmSize = lm.getMessages().size();
+                com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(lm.getLatLng().latitude(), lm.getLatLng().longitude());
+                String newLoc = getLocationAddress(newlatlng.latitude, newlatlng.longitude);
+                mMap.addMarker(new MarkerOptions().position(newlatlng).title("There is " + lmSize + " messages at " + newLoc));
+            }
         }
     }
 
-    ///CREATES LOG OUT OPTION
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return super.onCreateOptionsMenu(menu);
+    public void markUser(){
+        com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
+        mMap.addMarker(new MarkerOptions().position(newlatlng).title("This is you").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(newlatlng));
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_logout) {
-            logout();
-            return true;
+    public void getMessagesNearby(){
+        for (int i = 0; i < locationMessagesList.size(); i++) {
+            if (userLocation != null) {
+                mLocationInfoText.setText("Your current address: " + getLocationAddress(userLat, userLong));
+                if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
+                    ArrayAdapter adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
+                    mMessagesView.setAdapter(adapter);
+                }
+            } else {
+                Toast.makeText(MainActivity.this, "Location not found. Bad connection", Toast.LENGTH_SHORT).show();
+
+            }
         }
-        return super.onOptionsItemSelected(item);
     }
 
-    private void logout() {
-        FirebaseAuth.getInstance().signOut();
-        Intent intent = new Intent(MainActivity.this, LogInActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
-    }
-
-    ///LISTENER FROM DEVICES LOCATION. SETTING LAT AND LNG.
+    ///LISTENING FOR CHANGE IN LOCATION, SETTING USER LOCATION.
     private final LocationListener listener = new LocationListener() {
         public void onLocationChanged(Location location) {
 
             userLong = location.getLongitude();
             userLat = location.getLatitude();
 
-
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
-                    for (int i = 0; i < locationMessagesList.size(); i++) {
-                        if (userLocation != null) {
-                            com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
-                            mMap.moveCamera(CameraUpdateFactory.newLatLng(newlatlng));
-                            mMap.isMyLocationEnabled();
-                            if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                    requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.INTERNET}
-                                            , 10);
-                                }
-                                return;
-                            }
-                            mMap.setMyLocationEnabled(true);
-
-                            mLocationInfoText.setText("Your current address: " + getLocationInfo(userLat, userLong));
-                            if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
-                                ArrayAdapter adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
-                                mMessagesView.setAdapter(adapter);
-                            }
-                        } else {
-                            Toast.makeText(MainActivity.this, "Location not found. Bad connection", Toast.LENGTH_SHORT).show();
-
-                        }
-                    }
+                    markMessages();
+                    markUser();
+                    getMessagesNearby();
                     userLocation = new LatLng(userLat, userLong);
-                    getLocationInfo(userLat, userLong);
                 }
             });
         }
@@ -398,6 +351,48 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onProviderDisabled(String s) {
         }
     };
+
+    ///CREATES LOG OUT OPTION
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    ///SELECT LOGOUT
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_logout) {
+            logout();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    ///LOGOUT METHOD
+    private void logout() {
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(MainActivity.this, LogInActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

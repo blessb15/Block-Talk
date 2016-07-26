@@ -30,12 +30,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     @Bind(R.id.emailSignUp) EditText mEmailEditText;
     @Bind(R.id.submitNewUser) Button mSubmitNewUser;
     @Bind(R.id.loginView) TextView mLoginView;
+    @Bind(R.id.signUpHeader) TextView mSignUpHeader;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private ProgressDialog mAuthProgressDialog;
     private String mUsername;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,13 +44,13 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         ButterKnife.bind(this);
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
         mLoginView.setTypeface(font);
+        mSignUpHeader.setTypeface(font);
 
         mAuth = FirebaseAuth.getInstance();
         createAuthStateListener();
         createAuthProgressDialog();
         mSubmitNewUser.setOnClickListener(this);
         mLoginView.setOnClickListener(this);
-
     }
 
     @Override
