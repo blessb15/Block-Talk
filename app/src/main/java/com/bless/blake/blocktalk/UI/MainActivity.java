@@ -2,10 +2,12 @@ package com.bless.blake.blocktalk.UI;
 
 import com.bless.blake.blocktalk.Models.*;
 import com.bless.blake.blocktalk.*;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -27,10 +29,13 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+
 import com.bless.blake.blocktalk.Models.LatLng;
 import com.bless.blake.blocktalk.R;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -42,6 +47,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +64,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     EditText mUserMessage;
     @Bind(R.id.SubmitLocalMessage)
     Button mSubmitLocalMessage;
-    @Bind(R.id.locationInfoText) TextView mLocationInfoText;
+    @Bind(R.id.locationInfoText)
+    TextView mLocationInfoText;
+    @Bind(R.id.GetUser)
+    TextView mBlockMessage;
     private LocationManager locationManager;
     public static Double userLong;
     public static Double userLat;
@@ -71,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String username;
     private GoogleMap mMap;
+    private Circle userRadius;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +144,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        ///SETS FONT
+        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
+        mUserMessage.setTypeface(font);
+        mLocationInfoText.setTypeface(font);
+        mBlockMessage.setTypeface(font);
+
         ///MAP INSTANTIATION
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -178,7 +194,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     ///LOCAL MESSAGE SUBMIT
                     if (newMessage.length() > 0 && newLocationText.length() == 0 && userLocation != null) {
-                        if(checkForNearbyLMS(locationMessagesList, userLocation) == true){
+                        if (checkForNearbyLMS(locationMessagesList, userLocation) == true) {
                             List<String> messages = new ArrayList<>();
                             messages.add(username + ": " + newMessage);
                             LocationMessages locationMessages = new LocationMessages(userLocation, messages);
@@ -202,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     ///SEND MESSAGE TO NEW LOCATION
                     if (newLocationText.length() > 0 && newMessage.length() > 0) {
                         LatLng newLatLng = getNewUserLocation(newLocationText);
-                        if(checkForNearbyLMS(locationMessagesList, newLatLng) == true){
+                        if (checkForNearbyLMS(locationMessagesList, newLatLng) == true) {
                             List<String> messages = new ArrayList<>();
                             messages.add(username + ": " + newMessage);
                             LocationMessages locationMessages = new LocationMessages(newLatLng, messages);
@@ -236,14 +252,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 num += 1;
             }
         }
-        if(num == 0){
-           checkforlms = true;
+        if (num == 0) {
+            checkforlms = true;
         }
         return checkforlms;
     }
 
     ///GRABS LOCATION THAT USER PROVIDES AND CONVERTS TO LATLNG
-    public LatLng getNewUserLocation(String newLocation){
+    public LatLng getNewUserLocation(String newLocation) {
         Geocoder coder = new Geocoder(MainActivity.this);
         List<Address> address;
 
@@ -265,6 +281,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return stuff.get(0);
     }
 
+    ///RETURNS STRING OF CURRENT LOCATION
     public String getLocationInfo(double userLat, double userLong) {
         Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
         ArrayList stuff = new ArrayList();
@@ -276,8 +293,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         } catch (IOException e) {
             Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
         }
-        return location = stuff.get(0).toString();
-
+        if (stuff.size() > 0) {
+            location = stuff.get(0).toString();
+        } else {
+            location = "Error. Location not found.";
+        }
+        return location;
     }
 
     @Override
@@ -312,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onOptionsItemSelected(item);
     }
 
-    private void logout(){
+    private void logout() {
         FirebaseAuth.getInstance().signOut();
         Intent intent = new Intent(MainActivity.this, LogInActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -332,20 +353,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void run() {
                     ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
-                    for(int i = 0; i < locationMessagesList.size(); i++){
-                        if(userLocation != null) {
-                            Circle userRadius = mMap.addCircle(new CircleOptions()
-                                    .center(new com.google.android.gms.maps.model.LatLng(userLat, userLong))
-                                    .radius(80)
-                                    .strokeColor(Color.BLUE)
-                                    .fillColor(Color.BLUE));
+                    for (int i = 0; i < locationMessagesList.size(); i++) {
+                        if (userLocation != null) {
+                            com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
+                            mMap.moveCamera(CameraUpdateFactory.newLatLng(newlatlng));
+                            mMap.isMyLocationEnabled();
+                            if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.INTERNET}
+                                            , 10);
+                                }
+                                return;
+                            }
+                            mMap.setMyLocationEnabled(true);
+
                             mLocationInfoText.setText("Your current address: " + getLocationInfo(userLat, userLong));
                             if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
                                 ArrayAdapter adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
                                 mMessagesView.setAdapter(adapter);
                             }
                         } else {
-                            Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "Location not found. Bad connection", Toast.LENGTH_SHORT).show();
 
                         }
                     }

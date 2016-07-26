@@ -2,6 +2,7 @@ package com.bless.blake.blocktalk.UI;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,6 +43,9 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_log_in);
 
         ButterKnife.bind(this);
+
+        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
+        mSignUp.setTypeface(font);
 
         mSignIn.setOnClickListener(this);
         mSignUp.setOnClickListener(this);

@@ -44,9 +44,9 @@
 
         <EditText
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:id="@+id/newLocation"
-            android:hint="Address"
+            android:hint="@string/address"
             android:textAlignment="textStart"
             android:inputType="textCapSentences|textAutoCorrect"
             android:imeOptions="actionSend"
@@ -58,14 +58,15 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:minHeight="30dp"
-            android:maxWidth="200dp" />
+            android:minHeight="35dp"
+            android:maxWidth="85dp"
+            android:minWidth="75dp" />
 
         <EditText
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:id="@+id/LocalMessage"
-            android:hint="Send Message  "
+            android:hint="@string/send_message"
             android:textAlignment="textStart"
             android:inputType="textCapSentences|textAutoCorrect"
             android:imeOptions="actionSend"
@@ -81,8 +82,9 @@
             android:layout_toStartOf="@+id/SubmitLocalMessage"
             android:layout_marginRight="29dp"
             android:layout_marginEnd="29dp"
-            android:minHeight="30dp"
-            android:maxWidth="200dp" />
+            android:minHeight="35dp"
+            android:maxWidth="200dp"
+            android:minWidth="175dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -90,7 +92,7 @@
             android:id="@+id/GetUser"
             android:textSize="15sp"
             android:hint="@string/hey_user"
-            android:text="Messages on your block:"
+            android:text="@string/messages_on_your_block"
             android:layout_below="@+id/map"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
@@ -113,7 +115,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/locationInfoText"
         android:textColor="@color/colorBlack"
-        android:hint="Loading..."
+        android:hint="@string/loading"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"

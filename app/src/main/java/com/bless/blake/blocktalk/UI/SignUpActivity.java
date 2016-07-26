@@ -2,6 +2,7 @@ package com.bless.blake.blocktalk.UI;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -41,6 +42,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
         ButterKnife.bind(this);
+        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
+        mLoginView.setTypeface(font);
 
         mAuth = FirebaseAuth.getInstance();
         createAuthStateListener();
