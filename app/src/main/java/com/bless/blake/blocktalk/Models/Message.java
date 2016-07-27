@@ -2,6 +2,7 @@ package com.bless.blake.blocktalk.Models;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Blake on 7/26/2016.
@@ -13,7 +14,7 @@ public class Message {
     private boolean dislike;
     private String content;
     private Date now = new Date();
-    private SimpleDateFormat df = new SimpleDateFormat("mon dd, 'at' hh:m");
+    private SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm aaa");
 
     public Message(String user, String content){
         this.user = user;

@@ -31,17 +31,6 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true" />
 
-        <!--<ListView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:id="@+id/MessagesView"-->
-            <!--android:scrollIndicators="right"-->
-            <!--android:choiceMode="none"-->
-            <!--android:layout_alignParentRight="true"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_above="@+id/SubmitLocalMessage"-->
-            <!--android:layout_below="@+id/GetUser" />-->
-
         <Button
             android:layout_width="50dp"
             android:layout_height="100dp"
@@ -128,9 +117,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        tools:context="com.bless.blake.blocktalk.MapsActivity"
-        android:layout_alignRight="@+id/MessagesView"
-        android:layout_alignEnd="@+id/MessagesView" />
+        tools:context="com.bless.blake.blocktalk.MapsActivity" />
 
 
 </RelativeLayout>

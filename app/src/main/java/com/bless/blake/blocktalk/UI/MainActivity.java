@@ -24,16 +24,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.bless.blake.blocktalk.Models.LatLng;
 import com.bless.blake.blocktalk.R;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 return;
             }
-            locationManager.requestLocationUpdates(provider, 100000, 0, listener);
+            locationManager.requestLocationUpdates(provider, 5000, 0, listener);
         }
     }
 
@@ -193,9 +193,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             LocationMessages newLocationMessage = locationMessagesList.get(i);
                             Message message = new Message(username, newMessage);
                             newLocationMessage.getMessages().add(message);
+                            Map<String, Object> messageMap = new ObjectMapper().convertValue(message, Map.class);
                             Map<String, Object> update = new HashMap<String, Object>();
-                            update.put("messages", newLocationMessage.getMessages());
-                            locationMessagesRef.child(keys.get(i)).updateChildren(update);
+                            int messagesize = (locationMessagesList.get(i).getMessages().size() - 1);
+                            update.put(String.valueOf(messagesize), messageMap);
+                            locationMessagesRef.child(keys.get(i)).child("messages").updateChildren(update);
                             mUserMessage.setText("");
                         }
                     }
@@ -209,25 +211,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     ArrayList<Message> messages = new ArrayList<>();
                     Message message = new Message(username, newMessage);
                     messages.add(message);
-                    LocationMessages locationMessages = new LocationMessages(userLocation, messages);
+                    LocationMessages locationMessages = new LocationMessages(newLatLng, messages);
                     mUserMessage.setText("");
                     locationMessagesRef.push().setValue(locationMessages);
                     Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
                 }
-                for (int i = 0; i < locationMessagesList.size(); i++) {
-                    if (locationMessagesList.get(i).getLatLng().latitude() <= (newLatLng.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (newLatLng.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (newLatLng.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (newLatLng.longitude() - radius)) {
-                        LocationMessages newLocationMessage = locationMessagesList.get(i);
-                        Message message = new Message(username, newMessage);
-                        newLocationMessage.getMessages().add(message);
-                        Map<String, Object> update = new HashMap<String, Object>();
-                        update.put("messages", newLocationMessage.getMessages());
-                        locationMessagesRef.child(keys.get(i)).updateChildren(update);
-                        mUserMessage.setText("");
-                        Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
+                    for (int i = 0; i < locationMessagesList.size(); i++) {
+                        if (locationMessagesList.get(i).getLatLng().latitude() <= (newLatLng.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (newLatLng.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (newLatLng.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (newLatLng.longitude() - radius)) {
+                            LocationMessages newLocationMessage = locationMessagesList.get(i);
+                            Message message = new Message(username, newMessage);
+                            newLocationMessage.getMessages().add(message);
+                            Map<String, Object> messageMap = new ObjectMapper().convertValue(message, Map.class);
+                            Map<String, Object> update = new HashMap<String, Object>();
+                            int messagesize = (locationMessagesList.get(i).getMessages().size() - 1);
+                            update.put(String.valueOf(messagesize), messageMap);
+                            locationMessagesRef.child(keys.get(i)).child("messages").updateChildren(update);
+                            mUserMessage.setText("");
+                            Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
             }
-        }
     }
 
     ///CHECKS FOR LOCATION MESSAGES AROUND WHERE YOUR SENDING TO KEEP FROM DUPLICATION
@@ -245,6 +249,44 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return checkforlms;
     }
 
+    public void getMessagesNearby() {
+        if (locationMessagesList.size() > 0){
+            for (int i = 0; i < locationMessagesList.size(); i++) {
+                if (userLocation != null) {
+                    mLocationInfoText.setText("Your current address: " + getLocationAddress(userLat, userLong));
+                    if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
+                        mAdapter = new MessageListAdapter(getApplicationContext(), locationMessagesList.get(i).getMessages());
+                        mRecyclerView.setAdapter(mAdapter);
+                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+                        mRecyclerView.setLayoutManager(layoutManager);
+                        mRecyclerView.setHasFixedSize(true);
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "Location not found. Bad connection", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        }
+    }
+
+    public void markMessages() {
+        if(locationMessagesList.size() > 0) {
+            for (LocationMessages lm : locationMessagesList) {
+                int lmSize = lm.getMessages().size();
+                com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(lm.getLatLng().latitude(), lm.getLatLng().longitude());
+                String newLoc = getLocationAddress(newlatlng.latitude, newlatlng.longitude);
+                mMap.addMarker(new MarkerOptions().position(newlatlng).title("There is " + lmSize + " messages at " + newLoc));
+            }
+        }
+    }
+
+    public void markUser(){
+        mMap.clear();
+        com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
+        mMap.addMarker(new MarkerOptions().position(newlatlng).title("This is you").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(newlatlng));
+    }
+
     ///GRABS LOCATION THAT USER PROVIDES AND CONVERTS TO LATLNG
     public LatLng getNewUserLocation(String newLocation) {
         Geocoder coder = new Geocoder(MainActivity.this);
@@ -255,7 +297,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         try {
             address = coder.getFromLocationName(newLocation, 5);
-            System.out.println("YO " + address);
             if (address == null) {
                 Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
             }
@@ -286,41 +327,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             location = "Error. Location not found.";
         }
         return location;
-    }
-
-    public void markMessages() {
-        if(locationMessagesList.size() > 0) {
-            for (LocationMessages lm : locationMessagesList) {
-                int lmSize = lm.getMessages().size();
-                com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(lm.getLatLng().latitude(), lm.getLatLng().longitude());
-                String newLoc = getLocationAddress(newlatlng.latitude, newlatlng.longitude);
-                mMap.addMarker(new MarkerOptions().position(newlatlng).title("There is " + lmSize + " messages at " + newLoc));
-            }
-        }
-    }
-
-    public void markUser(){
-        com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
-        mMap.addMarker(new MarkerOptions().position(newlatlng).title("This is you").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(newlatlng));
-    }
-
-    public void getMessagesNearby(){
-        for (int i = 0; i < locationMessagesList.size(); i++) {
-            if (userLocation != null) {
-                mLocationInfoText.setText("Your current address: " + getLocationAddress(userLat, userLong));
-                if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
-                    mAdapter = new MessageListAdapter(getApplicationContext(), locationMessagesList.get(i).getMessages());
-                    mRecyclerView.setAdapter(mAdapter);
-                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
-                    mRecyclerView.setLayoutManager(layoutManager);
-                    mRecyclerView.setHasFixedSize(true);
-                }
-            } else {
-                Toast.makeText(MainActivity.this, "Location not found. Bad connection", Toast.LENGTH_SHORT).show();
-
-            }
-        }
     }
 
     ///LISTENING FOR CHANGE IN LOCATION, SETTING USER LOCATION.

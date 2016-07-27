@@ -1,17 +1,15 @@
 package com.bless.blake.blocktalk.Adapters;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.bless.blake.blocktalk.Models.Message;
 import com.bless.blake.blocktalk.R;
-
 import java.util.ArrayList;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -45,9 +43,9 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     }
 
     public class MessageViewHolder extends RecyclerView.ViewHolder {
-        @Bind(R.id.messageNameTextView) TextView mMessageName;
-        @Bind(R.id.messageContentTextView) TextView mMessageContent;
-        @Bind(R.id.dateTextView) TextView mMessageDate;
+        @Nullable @Bind(R.id.messageNameTextView) TextView mMessageName;
+        @Nullable @Bind(R.id.messageContentTextView) TextView mMessageContent;
+        @Nullable @Bind(R.id.dateTextView) TextView mMessageDate;
 
         private Context mContext;
 
@@ -59,8 +57,9 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
         public void bindMessage(Message message){
             mMessageName.setText(message.getUser());
-            mMessageContent.setText(message.getContent());
-            mMessageDate.setText(message.getDate());
+//            mMessageContent.setText(message.getContent());
+//            mMessageDate.setText(message.getDate());
+
         }
     }
 }
