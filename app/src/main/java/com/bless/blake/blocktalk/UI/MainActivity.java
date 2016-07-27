@@ -1,5 +1,6 @@
 package com.bless.blake.blocktalk.UI;
 
+import com.bless.blake.blocktalk.Adapters.MessageListAdapter;
 import com.bless.blake.blocktalk.Models.*;
 import com.bless.blake.blocktalk.*;
 import android.content.Context;
@@ -17,6 +18,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -51,18 +54,13 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
-    @Bind(R.id.newLocation)
-    EditText mNewLocation;
-    @Bind(R.id.MessagesView)
-    ListView mMessagesView;
-    @Bind(R.id.LocalMessage)
-    EditText mUserMessage;
-    @Bind(R.id.SubmitLocalMessage)
-    Button mSubmitLocalMessage;
-    @Bind(R.id.locationInfoText)
-    TextView mLocationInfoText;
-    @Bind(R.id.GetUser)
-    TextView mBlockMessage;
+    @Bind(R.id.newLocation) EditText mNewLocation;
+    @Bind(R.id.LocalMessage) EditText mUserMessage;
+    @Bind(R.id.SubmitLocalMessage) Button mSubmitLocalMessage;
+    @Bind(R.id.locationInfoText) TextView mLocationInfoText;
+    @Bind(R.id.GetUser) TextView mBlockMessage;
+    @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
+    private MessageListAdapter mAdapter;
     private LocationManager locationManager;
     public static Double userLong;
     public static Double userLat;
@@ -75,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String username;
     private GoogleMap mMap;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,8 +180,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             ///LOCAL MESSAGE SUBMIT
             if (newMessage.length() > 0 && newLocationText.length() == 0 && userLocation != null) {
                 if (checkForNearbyLMS(locationMessagesList, userLocation) == true) {
-                    List<String> messages = new ArrayList<>();
-                    messages.add(username + ": " + newMessage);
+                    ArrayList<Message> messages = new ArrayList<>();
+                    Message message = new Message(username, newMessage);
+                    messages.add(message);
                     LocationMessages locationMessages = new LocationMessages(userLocation, messages);
                     mUserMessage.setText("");
                     locationMessagesRef.push().setValue(locationMessages);
@@ -191,7 +191,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     for (int i = 0; i < locationMessagesList.size(); i++) {
                         if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
                             LocationMessages newLocationMessage = locationMessagesList.get(i);
-                            newLocationMessage.getMessages().add(username + ": " + newMessage);
+                            Message message = new Message(username, newMessage);
+                            newLocationMessage.getMessages().add(message);
                             Map<String, Object> update = new HashMap<String, Object>();
                             update.put("messages", newLocationMessage.getMessages());
                             locationMessagesRef.child(keys.get(i)).updateChildren(update);
@@ -205,9 +206,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (newLocationText.length() > 0 && newMessage.length() > 0) {
                 LatLng newLatLng = getNewUserLocation(newLocationText);
                 if (checkForNearbyLMS(locationMessagesList, newLatLng) == true) {
-                    List<String> messages = new ArrayList<>();
-                    messages.add(username + ": " + newMessage);
-                    LocationMessages locationMessages = new LocationMessages(newLatLng, messages);
+                    ArrayList<Message> messages = new ArrayList<>();
+                    Message message = new Message(username, newMessage);
+                    messages.add(message);
+                    LocationMessages locationMessages = new LocationMessages(userLocation, messages);
                     mUserMessage.setText("");
                     locationMessagesRef.push().setValue(locationMessages);
                     Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
@@ -215,7 +217,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (int i = 0; i < locationMessagesList.size(); i++) {
                     if (locationMessagesList.get(i).getLatLng().latitude() <= (newLatLng.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (newLatLng.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (newLatLng.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (newLatLng.longitude() - radius)) {
                         LocationMessages newLocationMessage = locationMessagesList.get(i);
-                        newLocationMessage.getMessages().add(username + ": " + newMessage);
+                        Message message = new Message(username, newMessage);
+                        newLocationMessage.getMessages().add(message);
                         Map<String, Object> update = new HashMap<String, Object>();
                         update.put("messages", newLocationMessage.getMessages());
                         locationMessagesRef.child(keys.get(i)).updateChildren(update);
@@ -307,8 +310,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (userLocation != null) {
                 mLocationInfoText.setText("Your current address: " + getLocationAddress(userLat, userLong));
                 if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
-                    ArrayAdapter adapter = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, locationMessagesList.get(i).getMessages());
-                    mMessagesView.setAdapter(adapter);
+                    mAdapter = new MessageListAdapter(getApplicationContext(), locationMessagesList.get(i).getMessages());
+                    mRecyclerView.setAdapter(mAdapter);
+                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
+                    mRecyclerView.setLayoutManager(layoutManager);
+                    mRecyclerView.setHasFixedSize(true);
                 }
             } else {
                 Toast.makeText(MainActivity.this, "Location not found. Bad connection", Toast.LENGTH_SHORT).show();

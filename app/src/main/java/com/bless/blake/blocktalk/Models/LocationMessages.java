@@ -7,10 +7,10 @@ import java.util.List;
  * Created by Guest on 7/13/16.
  */
 public class LocationMessages {
-    public List<String> messages = new ArrayList<>();
+    public ArrayList<Message> messages = new ArrayList<>();
     public LatLng latLng;
 
-    public LocationMessages(LatLng latLng, List<String> messages) {
+    public LocationMessages(LatLng latLng, ArrayList<Message> messages) {
         this.messages = messages;
         this.latLng = latLng;
     }
@@ -21,7 +21,7 @@ public class LocationMessages {
         return this.latLng;
     }
 
-    public List<String> getMessages(){
+    public ArrayList<Message> getMessages(){
         return this.messages;
     }
 
