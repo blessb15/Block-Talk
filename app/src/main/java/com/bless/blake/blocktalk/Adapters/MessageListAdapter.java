@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import com.bless.blake.blocktalk.Models.Message;
 import com.bless.blake.blocktalk.R;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     public class MessageViewHolder extends RecyclerView.ViewHolder {
         @Nullable @Bind(R.id.messageNameTextView) TextView mMessageName;
         @Nullable @Bind(R.id.messageContentTextView) TextView mMessageContent;
-        @Nullable @Bind(R.id.dateTextView) TextView mMessageDate;
+        @Nullable @Bind(R.id.messageDateTextView) TextView mMessageDate;
 
         private Context mContext;
 
@@ -57,8 +58,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
         public void bindMessage(Message message){
             mMessageName.setText(message.getUser());
-//            mMessageContent.setText(message.getContent());
-//            mMessageDate.setText(message.getDate());
+            mMessageContent.setText(message.getContent());
+            mMessageDate.setText(message.getDate());
 
         }
     }

@@ -32,7 +32,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import com.bless.blake.blocktalk.Models.LatLng;
 import com.bless.blake.blocktalk.R;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -67,11 +66,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public static LatLng userLocation;
     private Double radius = 0.0010;
     private DatabaseReference mLocationMessagesReference;
-    final ArrayList<LocationMessages> locationMessagesList = new ArrayList<>();
-    private ArrayList<String> keys = new ArrayList<>();
+    final public static ArrayList<LocationMessages> locationMessagesList = new ArrayList<>();
+    public static ArrayList<String> keys = new ArrayList<>();
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String username;
+    private String newMessage;
+    private String date;
     private GoogleMap mMap;
 
 
@@ -128,8 +129,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
                     keys.add(locationSnapshot.getKey());
                     locationMessagesList.add(locationSnapshot.getValue(LocationMessages.class));
-                    getMessagesNearby();
                 }
+                getMessagesNearby();
             }
 
             @Override
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
 
             String newLocationText = mNewLocation.getText().toString();
-            String newMessage = mUserMessage.getText().toString();
+            newMessage = mUserMessage.getText().toString();
 
             ///LOCAL MESSAGE SUBMIT
             if (newMessage.length() > 0 && newLocationText.length() == 0 && userLocation != null) {
