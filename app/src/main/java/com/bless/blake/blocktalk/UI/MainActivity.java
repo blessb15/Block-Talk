@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String username;
     private String newMessage;
-    private String date;
     private GoogleMap mMap;
 
 
@@ -293,10 +292,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-//    public void markUser() {
-//
-//    }
-
     ///GRABS LOCATION THAT USER PROVIDES AND CONVERTS TO LATLNG
     public LatLng getNewUserLocation(String newLocation) {
         Geocoder coder = new Geocoder(MainActivity.this);
@@ -351,7 +346,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void run() {
                     ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
                     markMessages();
-//                    markUser();
                     getMessagesNearby();
                     userLocation = new LatLng(userLat, userLong);
                 }
