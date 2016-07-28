@@ -3,6 +3,7 @@ package com.bless.blake.blocktalk.UI;
 import com.bless.blake.blocktalk.Adapters.MessageListAdapter;
 import com.bless.blake.blocktalk.Models.*;
 import com.bless.blake.blocktalk.*;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -28,8 +29,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+
 import com.bless.blake.blocktalk.Models.LatLng;
 import com.bless.blake.blocktalk.R;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -45,6 +48,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,12 +57,18 @@ import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, View.OnClickListener {
-    @Bind(R.id.newLocation) EditText mNewLocation;
-    @Bind(R.id.LocalMessage) EditText mUserMessage;
-    @Bind(R.id.SubmitLocalMessage) Button mSubmitLocalMessage;
-    @Bind(R.id.locationInfoText) TextView mLocationInfoText;
-    @Bind(R.id.GetUser) TextView mBlockMessage;
-    @Bind(R.id.recyclerView) RecyclerView mRecyclerView;
+    @Bind(R.id.newLocation)
+    EditText mNewLocation;
+    @Bind(R.id.LocalMessage)
+    EditText mUserMessage;
+    @Bind(R.id.SubmitLocalMessage)
+    Button mSubmitLocalMessage;
+    @Bind(R.id.locationInfoText)
+    TextView mLocationInfoText;
+    @Bind(R.id.GetUser)
+    TextView mBlockMessage;
+    @Bind(R.id.recyclerView)
+    RecyclerView mRecyclerView;
     private MessageListAdapter mAdapter;
     private LocationManager locationManager;
     public static Double userLong;
@@ -131,6 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     locationMessagesList.add(locationSnapshot.getValue(LocationMessages.class));
                 }
                 getMessagesNearby();
+                markMessages();
             }
 
             @Override
@@ -217,22 +228,22 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     locationMessagesRef.push().setValue(locationMessages);
                     Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
                 }
-                    for (int i = 0; i < locationMessagesList.size(); i++) {
-                        if (locationMessagesList.get(i).getLatLng().latitude() <= (newLatLng.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (newLatLng.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (newLatLng.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (newLatLng.longitude() - radius)) {
-                            LocationMessages newLocationMessage = locationMessagesList.get(i);
-                            Message message = new Message(username, newMessage);
-                            newLocationMessage.getMessages().add(message);
-                            Map<String, Object> messageMap = new ObjectMapper().convertValue(message, Map.class);
-                            Map<String, Object> update = new HashMap<String, Object>();
-                            int messagesize = (locationMessagesList.get(i).getMessages().size() - 1);
-                            update.put(String.valueOf(messagesize), messageMap);
-                            locationMessagesRef.child(keys.get(i)).child("messages").updateChildren(update);
-                            mUserMessage.setText("");
-                            Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
-                        }
+                for (int i = 0; i < locationMessagesList.size(); i++) {
+                    if (locationMessagesList.get(i).getLatLng().latitude() <= (newLatLng.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (newLatLng.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (newLatLng.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (newLatLng.longitude() - radius)) {
+                        LocationMessages newLocationMessage = locationMessagesList.get(i);
+                        Message message = new Message(username, newMessage);
+                        newLocationMessage.getMessages().add(message);
+                        Map<String, Object> messageMap = new ObjectMapper().convertValue(message, Map.class);
+                        Map<String, Object> update = new HashMap<String, Object>();
+                        int messagesize = (locationMessagesList.get(i).getMessages().size() - 1);
+                        update.put(String.valueOf(messagesize), messageMap);
+                        locationMessagesRef.child(keys.get(i)).child("messages").updateChildren(update);
+                        mUserMessage.setText("");
+                        Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
+        }
     }
 
     ///CHECKS FOR LOCATION MESSAGES AROUND WHERE YOUR SENDING TO KEEP FROM DUPLICATION
@@ -251,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void getMessagesNearby() {
-        if (locationMessagesList.size() > 0){
+        if (locationMessagesList.size() > 0) {
             for (int i = 0; i < locationMessagesList.size(); i++) {
                 if (userLocation != null) {
                     mLocationInfoText.setText("Your current address: " + getLocationAddress(userLat, userLong));
@@ -271,7 +282,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void markMessages() {
-        if(locationMessagesList.size() > 0) {
+        mMap.clear();
+        if (locationMessagesList.size() > 0) {
             for (LocationMessages lm : locationMessagesList) {
                 int lmSize = lm.getMessages().size();
                 com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(lm.getLatLng().latitude(), lm.getLatLng().longitude());
@@ -281,12 +293,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public void markUser(){
-        mMap.clear();
-        com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
-        mMap.addMarker(new MarkerOptions().position(newlatlng).title("This is you").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(newlatlng));
-    }
+//    public void markUser() {
+//
+//    }
 
     ///GRABS LOCATION THAT USER PROVIDES AND CONVERTS TO LATLNG
     public LatLng getNewUserLocation(String newLocation) {
@@ -342,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void run() {
                     ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
                     markMessages();
-                    markUser();
+//                    markUser();
                     getMessagesNearby();
                     userLocation = new LatLng(userLat, userLong);
                 }
@@ -410,5 +419,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.INTERNET}
+                        , 10);
+            }
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
     }
 }
