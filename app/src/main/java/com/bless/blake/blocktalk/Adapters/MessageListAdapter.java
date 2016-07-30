@@ -1,15 +1,20 @@
 package com.bless.blake.blocktalk.Adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bless.blake.blocktalk.Models.Message;
 import com.bless.blake.blocktalk.R;
+import com.bless.blake.blocktalk.UI.MainActivity;
+
 import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -47,20 +52,20 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         @Nullable @Bind(R.id.messageNameTextView) TextView mMessageName;
         @Nullable @Bind(R.id.messageContentTextView) TextView mMessageContent;
         @Nullable @Bind(R.id.messageDateTextView) TextView mMessageDate;
-
+//        @Nullable @Bind(R.id.messageOKTextView) TextView mMessageOKCounter;
         private Context mContext;
 
-        public MessageViewHolder(View itemView){
+        public MessageViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             mContext = itemView.getContext();
         }
 
-        public void bindMessage(Message message){
+        public void bindMessage(Message message) {
             mMessageName.setText(message.getUser());
             mMessageContent.setText(message.getContent());
             mMessageDate.setText(message.getDate());
-
+//            mMessageOKCounter.setText(message.getLikes().size());
         }
     }
 }

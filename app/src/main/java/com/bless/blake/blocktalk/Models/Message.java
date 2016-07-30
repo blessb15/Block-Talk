@@ -1,6 +1,11 @@
 package com.bless.blake.blocktalk.Models;
 
+import android.widget.Toast;
+
+import com.bless.blake.blocktalk.UI.MainActivity;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -10,18 +15,16 @@ import java.util.Locale;
 public class Message {
     private String user;
     private String date;
-    private boolean like;
-    private boolean dislike;
+    public static ArrayList<String> likes;
     private String content;
     private Date now = new Date();
-    private SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy HH:mm aaa");
+    private SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy hh:mm aaa");
 
     public Message(String user, String content){
         this.user = user;
         this.content = content;
-        this.like = false;
-        this.dislike = false;
         this.date = df.format(now);
+        this.likes = new ArrayList<String>();
     }
 
     public Message(){}
@@ -38,19 +41,15 @@ public class Message {
         return this.content;
     }
 
-    public boolean getLike(){
-        return this.like;
+    public ArrayList<String> getLikes(){
+        return this.likes;
     }
 
-    public boolean getDislike(){
-        return this.dislike;
-    }
-
-    public boolean likeIt(){
-        return this.like = true;
-    }
-
-    public boolean dislikeIt(){
-        return this.dislike = true;
+    public static void likeIt(String user){
+        if (!likes.contains(user)){
+            likes.add(user);
+        } else {
+            likes.remove(user);
+        }
     }
 }

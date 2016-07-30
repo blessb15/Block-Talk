@@ -8,14 +8,14 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:52783457348:android:c9c82b8eb43e1712",
+        "mobilesdk_app_id": "1:52783457348:android:081253cfba12897b",
         "android_client_info": {
           "package_name": "com.bless.blake.blocktalk"
         }
       },
       "oauth_client": [
         {
-          "client_id": "52783457348-72cl5sqjcvl19ijgrqoufe42g1h33ti8.apps.googleusercontent.com",
+          "client_id": "52783457348-mscivqgl1hift479nj6hqols0ah5atji.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.bless.blake.blocktalk",
@@ -29,7 +29,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBi6Y2KKv6jUVeha4tI7zS1k9qOjFDOku4"
+          "current_key": "AIzaSyA87Tc9u3it5II9Ez6vRHMLyhpjEDgjXPI"
         }
       ],
       "services": {
@@ -37,13 +37,8 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 2,
-          "other_platform_oauth_client": [
-            {
-              "client_id": "52783457348-6g0kkb1dmbklkifl0hkrdaa8btkb4jit.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "status": 1,
+          "other_platform_oauth_client": []
         },
         "ads_service": {
           "status": 2

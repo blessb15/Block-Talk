@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <GridLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@drawable/message_border"
-        android:layout_height="match_parent"
-        android:padding="10dp"
-        android:scrollIndicators="right"
-        android:showDividers="middle|end">
+        android:rowCount="17"
+        android:columnCount="86"
+        android:orientation="vertical"
+        android:translationZ="1dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -19,7 +19,13 @@
             android:id="@+id/messageNameTextView"
             android:textSize="20dp"
             android:textStyle="bold"
-            android:textColor="@color/colorAccent"/>
+            android:textColor="@color/colorAccent"
+            android:hint="User"
+            android:layout_row="0"
+            android:layout_column="0"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,16 +34,50 @@
             android:layout_below="@+id/messageContentTextView"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:textStyle="italic"/>
+            android:textStyle="italic"
+            android:hint="SUUUUHHHH DUDE"
+            android:layout_row="4"
+            android:layout_column="0"
+            android:padding="10dp" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="140dp"
             android:layout_height="wrap_content"
             android:id="@+id/messageDateTextView"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:textColor="@color/colorAccent"
-            android:layout_gravity="right" />
+            android:layout_gravity="right"
+            android:hint="123 pm"
+            android:layout_row="16"
+            android:layout_column="0"
+            android:textAlignment="textStart"
+            android:textSize="10dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp" />
 
-    </LinearLayout>
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/messageOKTextView"-->
+            <!--android:layout_gravity="right"-->
+            <!--android:hint="7"-->
+            <!--android:layout_row="0"-->
+            <!--android:layout_column="84"-->
+            <!--android:paddingTop="3dp"-->
+            <!--android:textSize="10dp"-->
+            <!--android:paddingBottom="10dp" />-->
+
+        <!--<ImageView-->
+            <!--android:layout_width="28dp"-->
+            <!--android:layout_height="42dp"-->
+            <!--android:id="@+id/messageOKImageView"-->
+            <!--android:layout_row="0"-->
+            <!--android:layout_column="85"-->
+            <!--android:src="@drawable/ok_pic"-->
+            <!--android:paddingRight="5dp" />-->
+
+    </GridLayout>
+
 </LinearLayout>
