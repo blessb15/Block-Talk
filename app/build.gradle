@@ -2,18 +2,24 @@ apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'block_talk'
+            keyPassword 'cheesychicken'
+            storeFile file('C:/Users/Blake/Desktop/keystore/blocktalk_keystore.jks')
+            storePassword 'cheesychicken'
+        }
+    }
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
-
     defaultConfig {
-        applicationId "com.bless.blake.blocktalk"
+        applicationId "com.stuff.blake.blocktalk"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 7
-        versionName "1.06"
+        versionCode 12
+        versionName "1.12"
         multiDexEnabled true
     }
-
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES.txt'
         exclude 'META-INF/DEPENDENCIES'
@@ -26,35 +32,38 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/notice.txt'
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
 }
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.jakewharton:butterknife:7.0.1'
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
+    apt 'org.parceler:parceler:1.1.1'
+    compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.google.android.gms:play-services:9.2.1'
-    compile 'com.squareup.okhttp3:okhttp:3.2.0'
     compile 'se.akerfeldt:okhttp-signpost:1.1.0'
     compile 'com.google.firebase:firebase-database:9.0.2'
     compile 'com.google.firebase:firebase-auth:9.0.2'
+    compile 'com.google.firebase:firebase-core:9.2.1'
     compile 'com.firebaseui:firebase-ui-database:0.4.1'
-    compile 'com.android.support:recyclerview-v7:24.0.0'
-    compile 'com.google.android.gms:play-services-ads:9.2.1'
-    compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.android.support:recyclerview-v7:+'
-    compile 'com.firebaseui:firebase-ui-database:0.4.1'
+    compile 'com.android.support:recyclerview-v7:24.1.1'
+    compile 'com.android.support:appcompat-v7:24.1.1'
     compile 'org.parceler:parceler-api:1.1.1'
-    apt 'org.parceler:parceler:1.1.1'
     compile 'com.fasterxml.jackson.core:jackson-core:2.4.1'
     compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.1'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1'
+    compile 'com.google.android.gms:play-services-ads:9.2.1'
+    compile 'com.google.android.gms:play-services-auth:9.2.1'
+    compile 'com.google.android.gms:play-services-gcm:9.2.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

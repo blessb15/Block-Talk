@@ -19,7 +19,7 @@ _No current known bugs._
 
 ## Support and contact details
 
-blakebless7@gmail.com
+blakestuff7@gmail.com
 
 ## Technologies Used
 
@@ -28,4 +28,4 @@ blakebless7@gmail.com
 
 ### License
 
-Copyright (c) 2016 **_Blake Bless_**
+Copyright (c) 2016 **_Blake stuff_**

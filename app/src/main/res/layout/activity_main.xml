@@ -102,7 +102,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        tools:context="com.bless.blake.blocktalk.MapsActivity" />
+        tools:context="com.stuff.blake.blocktalk.MapsActivity" />
 
     <TextView
         android:layout_width="wrap_content"

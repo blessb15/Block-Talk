@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:52783457348:android:081253cfba12897b",
+        "mobilesdk_app_id": "1:52783457348:android:e6c9a1e8d6622f6d",
         "android_client_info": {
-          "package_name": "com.bless.blake.blocktalk"
+          "package_name": "com.stuff.blake.blocktalk"
         }
       },
       "oauth_client": [
         {
-          "client_id": "52783457348-mscivqgl1hift479nj6hqols0ah5atji.apps.googleusercontent.com",
+          "client_id": "52783457348-h5ncpbec4g25epoct2f0f8ip4gilc7ro.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.bless.blake.blocktalk",
+            "package_name": "com.stuff.blake.blocktalk",
             "certificate_hash": "BCE2CC3289792F6E6753A10A2BD6B63A841EA5D7"
           }
         },
@@ -29,7 +29,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA87Tc9u3it5II9Ez6vRHMLyhpjEDgjXPI"
+          "current_key": "AIzaSyByWoAqjkN4XzZM4tRrpSoEzi9bKAXIddI"
         }
       ],
       "services": {
@@ -37,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "52783457348-6g0kkb1dmbklkifl0hkrdaa8btkb4jit.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
