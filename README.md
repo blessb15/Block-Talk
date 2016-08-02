@@ -1,4 +1,4 @@
-# BlockTalk
+# Block Talk
 
 messaging app that lets users instant message people that are within a block of distance. Will also allow users to send messages to a location
 but this message will only be visible if they are a blocks distance away.
