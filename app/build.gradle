@@ -40,9 +40,11 @@ android {
         }
         debug {
             signingConfig signingConfigs.config
+            debuggable true
         }
     }
 }
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'

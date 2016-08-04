@@ -6,11 +6,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.stuff.blake.blocktalk.Models.Message;
 import com.stuff.blake.blocktalk.R;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -21,10 +23,12 @@ import butterknife.ButterKnife;
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.MessageViewHolder>{
     private ArrayList<Message> mMessages = new ArrayList<>();
     private Context mContext;
+    private final OnItemClickListener listener;
 
-    public MessageListAdapter(Context context, ArrayList<Message> messages){
+    public MessageListAdapter(Context context, ArrayList<Message> messages, OnItemClickListener listener){
         mContext = context;
         mMessages = messages;
+        this.listener = listener;
     }
 
     @Override
@@ -34,9 +38,13 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         return viewHolder;
     }
 
+    public interface OnItemClickListener {
+        void onItemClick(Message message);
+    }
+
     @Override
     public void onBindViewHolder(MessageListAdapter.MessageViewHolder holder, int position){
-        holder.bindMessage(mMessages.get(position));
+        holder.bindMessage(mMessages.get(position), listener);
     }
 
     @Override
@@ -48,7 +56,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         @Nullable @Bind(R.id.messageNameTextView) TextView mMessageName;
         @Nullable @Bind(R.id.messageContentTextView) TextView mMessageContent;
         @Nullable @Bind(R.id.messageDateTextView) TextView mMessageDate;
-//        @Nullable @Bind(R.id.messageOKTextView) TextView mMessageOKCounter;
         private Context mContext;
 
         public MessageViewHolder(View itemView) {
@@ -57,11 +64,17 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             mContext = itemView.getContext();
         }
 
-        public void bindMessage(Message message) {
+        public void bindMessage(final Message message, final OnItemClickListener listener) {
+            String messageLikeSize = String.valueOf(message.getLikes().size());
             mMessageName.setText(message.getUser());
             mMessageContent.setText(message.getContent());
             mMessageDate.setText(message.getDate());
-//            mMessageOKCounter.setText(message.getLikes().size());
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View view){
+                    listener.onItemClick(message);
+                    System.out.println("YO A CLICK");
+                }
+            });
         }
     }
 }

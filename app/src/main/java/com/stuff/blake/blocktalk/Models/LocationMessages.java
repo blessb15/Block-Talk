@@ -1,6 +1,12 @@
 package com.stuff.blake.blocktalk.Models;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.stuff.blake.blocktalk.Constants;
+import com.stuff.blake.blocktalk.UI.MainActivity;
+
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Created by Guest on 7/13/16.

@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Double radius = 0.0010;
     private DatabaseReference mLocationMessagesReference;
     final public static ArrayList<LocationMessages> locationMessagesList = new ArrayList<>();
-    public static ArrayList<String> keys = new ArrayList<>();
+    public static ArrayList<String> lmKeys = new ArrayList<>();
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private String username;
@@ -93,10 +93,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ButterKnife.bind(this);
 
         ///SETS FONT
-//        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
-//        mUserMessage.setTypeface(font);
-//        mLocationInfoText.setTypeface(font);
-//        mBlockMessage.setTypeface(font);
+        Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
+        mUserMessage.setTypeface(font);
+        mLocationInfoText.setTypeface(font);
+        mBlockMessage.setTypeface(font);
 
         ///MAP INSTANTIATION
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -131,12 +131,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         final Context stuff = this;
         mLocationMessagesReference.addValueEventListener(new ValueEventListener() {
 
-            ///DATABASE STUFF, GRAB LOCATION MESSAGES, GRAB UNIQUE KEYS TO COMPARE.
+            ///DATABASE STUFF, GRAB LOCATION MESSAGES, GRAB UNIQUE lmKeys TO COMPARE.
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot locationSnapshot : dataSnapshot.getChildren()) {
-                    keys.add(locationSnapshot.getKey());
+                    lmKeys.add(locationSnapshot.getKey());
                     locationMessagesList.add(locationSnapshot.getValue(LocationMessages.class));
+                    for(int i = 0; i < locationMessagesList.size(); i++){
+                    }
                 }
                 getMessagesNearby();
                 markMessages();
@@ -207,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             Map<String, Object> update = new HashMap<String, Object>();
                             int messagesize = (locationMessagesList.get(i).getMessages().size() - 1);
                             update.put(String.valueOf(messagesize), messageMap);
-                            locationMessagesRef.child(keys.get(i)).child("messages").updateChildren(update);
+                            locationMessagesRef.child(lmKeys.get(i)).child("messages").updateChildren(update);
                             mUserMessage.setText("");
                         }
                     }
@@ -235,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Map<String, Object> update = new HashMap<String, Object>();
                         int messagesize = (locationMessagesList.get(i).getMessages().size() - 1);
                         update.put(String.valueOf(messagesize), messageMap);
-                        locationMessagesRef.child(keys.get(i)).child("messages").updateChildren(update);
+                        locationMessagesRef.child(lmKeys.get(i)).child("messages").updateChildren(update);
                         mUserMessage.setText("");
                         Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
                     }
@@ -267,7 +269,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (userLocation != null) {
                     mLocationInfoText.setText("Your current address: " + getLocationAddress(userLat, userLong));
                     if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
-                        mAdapter = new MessageListAdapter(getApplicationContext(), locationMessagesList.get(i).getMessages());
+                        mAdapter = new MessageListAdapter(getApplicationContext(), locationMessagesList.get(i).getMessages(), new MessageListAdapter.OnItemClickListener() {
+                            @Override public void onItemClick(Message message) {
+                                    message.likeIt(message.getUser(), locationMessagesList);
+                                    System.out.println("YO A CLICK 2");
+                            }
+                        });
                         mRecyclerView.setAdapter(mAdapter);
                         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
                         mRecyclerView.setLayoutManager(layoutManager);

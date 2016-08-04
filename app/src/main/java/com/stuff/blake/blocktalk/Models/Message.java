@@ -1,5 +1,11 @@
 package com.stuff.blake.blocktalk.Models;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.stuff.blake.blocktalk.Constants;
+import com.stuff.blake.blocktalk.UI.MainActivity;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,36 +21,34 @@ public class Message {
     private Date now = new Date();
     private SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy hh:mm aaa");
 
-    public Message(String user, String content){
+    public Message(String user, String content) {
         this.user = user;
         this.content = content;
         this.date = df.format(now);
         this.likes = new ArrayList<String>();
+        likes.add(user);
     }
 
-    public Message(){}
+    public Message() {
+    }
 
-    public String getUser(){
+    public String getUser() {
         return this.user;
     }
 
-    public String getDate(){
+    public String getDate() {
         return this.date;
     }
 
-    public String getContent(){
+    public String getContent() {
         return this.content;
     }
 
-    public ArrayList<String> getLikes(){
+    public ArrayList<String> getLikes() {
         return this.likes;
     }
 
-    public static void likeIt(String user){
-        if (!likes.contains(user)){
-            likes.add(user);
-        } else {
-            likes.remove(user);
-        }
+    public void likeIt(String user, ArrayList<LocationMessages> lms) {
+
     }
 }
