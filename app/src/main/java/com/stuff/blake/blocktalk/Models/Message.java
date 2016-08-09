@@ -19,7 +19,7 @@ public class Message {
     public static ArrayList<String> likes;
     private String content;
     private Date now = new Date();
-    private SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy hh:mm aaa");
+    private SimpleDateFormat df = new SimpleDateFormat("EEE, d MMM yyyy hh:mm:ss aaa");
 
     public Message(String user, String content) {
         this.user = user;
@@ -48,7 +48,11 @@ public class Message {
         return this.likes;
     }
 
-    public void likeIt(String user, ArrayList<LocationMessages> lms) {
+    public void likeIt(String user, Message message) {
+        DatabaseReference messagesRef = FirebaseDatabase
+                .getInstance()
+                .getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
 
+        System.out.println("YO " + messagesRef);
     }
 }

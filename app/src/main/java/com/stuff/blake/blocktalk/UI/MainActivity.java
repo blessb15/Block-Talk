@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .getInstance()
                 .getReference()
                 .child(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
-        final Context stuff = this;
         mLocationMessagesReference.addValueEventListener(new ValueEventListener() {
 
             ///DATABASE STUFF, GRAB LOCATION MESSAGES, GRAB UNIQUE lmKeys TO COMPARE.
@@ -181,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void onClick(View view) {
+
         if (view == mSubmitLocalMessage) {
             DatabaseReference locationMessagesRef = FirebaseDatabase
                     .getInstance()
@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
                         mAdapter = new MessageListAdapter(getApplicationContext(), locationMessagesList.get(i).getMessages(), new MessageListAdapter.OnItemClickListener() {
                             @Override public void onItemClick(Message message) {
-                                    message.likeIt(message.getUser(), locationMessagesList);
+                                    message.likeIt(message.getUser(), message);
                                     System.out.println("YO A CLICK 2");
                             }
                         });
@@ -295,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 int lmSize = lm.getMessages().size();
                 com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(lm.getLatLng().latitude(), lm.getLatLng().longitude());
                 String newLoc = getLocationAddress(newlatlng.latitude, newlatlng.longitude);
-                mMap.addMarker(new MarkerOptions().position(newlatlng).title("There is " + lmSize + " messages at " + newLoc));
+                mMap.addMarker(new MarkerOptions().position(newlatlng).title("There is " + lmSize + " message(s) at " + newLoc));
             }
         }
     }
@@ -325,19 +325,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ///RETURNS STRING OF CURRENT LOCATION
     public String getLocationAddress(double userLat, double userLong) {
         Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
-        ArrayList stuff = new ArrayList();
-        String location;
+        ArrayList addressArray = new ArrayList();
+        String location = "Not found ";
         try {
             List<Address> address = geocoder.getFromLocation(userLat, userLong, 5);
             Address userLocationInfo = address.get(0);
-            stuff.add(userLocationInfo.getAddressLine(0).toString());
+            addressArray.add(userLocationInfo.getAddressLine(0).toString());
         } catch (IOException e) {
             Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
         }
-        if (stuff.size() > 0) {
-            location = stuff.get(0).toString();
-        } else {
-            location = "Error. Location not found.";
+        if (addressArray.size() > 0) {
+            location = addressArray.get(0).toString();
         }
         return location;
     }
