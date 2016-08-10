@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BlockTalk.iml" filepath="$PROJECT_DIR$/BlockTalk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Block-Talk.iml" filepath="$PROJECT_DIR$/Block-Talk.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

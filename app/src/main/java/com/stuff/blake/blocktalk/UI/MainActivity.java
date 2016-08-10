@@ -272,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mAdapter = new MessageListAdapter(getApplicationContext(), locationMessagesList.get(i).getMessages(), new MessageListAdapter.OnItemClickListener() {
                             @Override public void onItemClick(Message message) {
                                     message.likeIt(message.getUser(), message);
-                                    System.out.println("YO A CLICK 2");
+                                    System.out.println("YO A CLICKY");
                             }
                         });
                         mRecyclerView.setAdapter(mAdapter);
@@ -351,7 +351,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void run() {
                     ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
-                    markMessages();
                     getMessagesNearby();
                     userLocation = new LatLng(userLat, userLong);
                 }

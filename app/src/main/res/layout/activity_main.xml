@@ -47,7 +47,7 @@
 
         <EditText
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:id="@+id/newLocation"
             android:hint="Address"
             android:textAlignment="textStart"
@@ -60,17 +60,17 @@
             android:paddingStart="10dp"
             android:minHeight="30dp"
             android:maxWidth="150dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:paddingLeft="5dp"
             android:paddingTop="3dp"
             android:paddingRight="5dp"
-            android:paddingBottom="3dp" />
+            android:paddingBottom="3dp"
+            android:layout_below="@+id/recyclerView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
         <EditText
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:id="@+id/LocalMessage"
             android:hint="Send Message  "
             android:inputType="textCapSentences|textAutoCorrect"
@@ -107,7 +107,7 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="270dp"
+        android:layout_height="150dp"
         tools:context="com.stuff.blake.blocktalk.MapsActivity"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"

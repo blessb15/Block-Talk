@@ -6,13 +6,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.stuff.blake.blocktalk.Models.Message;
 import com.stuff.blake.blocktalk.R;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -25,10 +23,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     private Context mContext;
     private final OnItemClickListener listener;
 
-    public MessageListAdapter(Context context, ArrayList<Message> messages, OnItemClickListener listener){
+    public MessageListAdapter(Context context, ArrayList<Message> messages, OnItemClickListener lis){
         mContext = context;
         mMessages = messages;
-        this.listener = listener;
+        listener = lis;
     }
 
     @Override
@@ -65,14 +63,12 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
         }
 
         public void bindMessage(final Message message, final OnItemClickListener listener) {
-            String messageLikeSize = String.valueOf(message.getLikes().size());
             mMessageName.setText(message.getUser());
             mMessageContent.setText(message.getContent());
             mMessageDate.setText(message.getDate());
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View view){
                     listener.onItemClick(message);
-                    System.out.println("YO A CLICK");
                 }
             });
         }
