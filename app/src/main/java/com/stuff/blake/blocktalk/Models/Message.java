@@ -53,6 +53,17 @@ public class Message {
                 .getInstance()
                 .getReference(Constants.FIREBASE_CHILD_LOCATIONMESSAGES);
 
-        System.out.println("YO " + messagesRef);
+        ///USE THESE AS REFRENCE, TOP PULLS FROM DB, BOTTOM PULLS FROM CLASS.
+        System.out.println("YO " + messagesRef.child(MainActivity.lmKeys.get(0)).child("messages").child("0").child("date").removeValue().toString());
+//        System.out.println("YO " + MainActivity.locationMessagesList.get(0).getMessages().get(0).getLikes());
+        message.getLikes().add(user);
+        for(int i = 0; i < MainActivity.locationMessagesList.size(); i++){
+            if (messagesRef.child(MainActivity.lmKeys.get(i)).child("messages").child(String.valueOf(i)).child("date").toString().contains(message.getDate())){
+                System.out.println("YO AWWW YEEE");
+            }
+        }
+
+
+
     }
 }
