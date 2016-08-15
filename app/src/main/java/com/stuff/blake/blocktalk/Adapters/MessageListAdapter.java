@@ -21,12 +21,10 @@ import butterknife.ButterKnife;
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.MessageViewHolder>{
     private ArrayList<Message> mMessages = new ArrayList<>();
     private Context mContext;
-    private final OnItemClickListener listener;
 
-    public MessageListAdapter(Context context, ArrayList<Message> messages, OnItemClickListener lis){
+    public MessageListAdapter(Context context, ArrayList<Message> messages){
         mContext = context;
         mMessages = messages;
-        listener = lis;
     }
 
     @Override
@@ -42,7 +40,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     @Override
     public void onBindViewHolder(MessageListAdapter.MessageViewHolder holder, int position){
-        holder.bindMessage(mMessages.get(position), listener);
+        holder.bindMessage(mMessages.get(position));
     }
 
     @Override
@@ -62,15 +60,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
             mContext = itemView.getContext();
         }
 
-        public void bindMessage(final Message message, final OnItemClickListener listener) {
+        public void bindMessage(final Message message) {
             mMessageName.setText(message.getUser());
             mMessageContent.setText(message.getContent());
             mMessageDate.setText(message.getDate());
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override public void onClick(View view){
-                    listener.onItemClick(message);
-                }
-            });
         }
     }
 }

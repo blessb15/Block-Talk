@@ -1,5 +1,7 @@
 package com.stuff.blake.blocktalk.UI;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.stuff.blake.blocktalk.Adapters.MessageListAdapter;
 import com.stuff.blake.blocktalk.Models.*;
 import com.stuff.blake.blocktalk.*;
@@ -62,8 +64,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     EditText mUserMessage;
     @Bind(R.id.SubmitLocalMessage)
     Button mSubmitLocalMessage;
-    @Bind(R.id.locationInfoText)
-    TextView mLocationInfoText;
     @Bind(R.id.GetUser)
     TextView mBlockMessage;
     @Bind(R.id.recyclerView)
@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ///SETS FONT
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/Poppins-Regular.ttf");
         mUserMessage.setTypeface(font);
-        mLocationInfoText.setTypeface(font);
         mBlockMessage.setTypeface(font);
+        mNewLocation.setTypeface(font);
 
         ///MAP INSTANTIATION
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -267,21 +267,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (locationMessagesList.size() > 0) {
             for (int i = 0; i < locationMessagesList.size(); i++) {
                 if (userLocation != null) {
-                    mLocationInfoText.setText("Your current address: " + getLocationAddress(userLat, userLong));
                     if (locationMessagesList.get(i).getLatLng().latitude() <= (userLocation.latitude() + radius) && locationMessagesList.get(i).getLatLng().latitude() >= (userLocation.latitude() - radius) && locationMessagesList.get(i).getLatLng().longitude() <= (userLocation.longitude() + radius) && locationMessagesList.get(i).getLatLng().longitude() >= (userLocation.longitude() - radius)) {
-                        mAdapter = new MessageListAdapter(getApplicationContext(), locationMessagesList.get(i).getMessages(), new MessageListAdapter.OnItemClickListener() {
-                            @Override public void onItemClick(Message message) {
-                                    message.likeIt(message.getUser(), message);
-                                    System.out.println("YO A CLICKY");
-                            }
-                        });
+                        mAdapter = new MessageListAdapter(getApplicationContext(), locationMessagesList.get(i).getMessages());
                         mRecyclerView.setAdapter(mAdapter);
                         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
                         mRecyclerView.setLayoutManager(layoutManager);
                         mRecyclerView.setHasFixedSize(true);
                     }
                 } else {
-                    Toast.makeText(MainActivity.this, "Location not found. Bad connection", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -351,8 +344,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void run() {
                     ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
-                    getMessagesNearby();
                     userLocation = new LatLng(userLat, userLong);
+                    mNewLocation.setHint(getLocationAddress(userLat, userLong));
+                    getMessagesNearby();
+                    com.google.android.gms.maps.model.LatLng userLatLong = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
+                    CameraUpdateFactory.newLatLng(userLatLong);
+                    CameraUpdate userLocation = CameraUpdateFactory.newLatLngZoom(userLatLong, 3);
+                    mMap.animateCamera(userLocation);
                 }
             });
         }
@@ -425,6 +423,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             return;
         }
+        CameraUpdateFactory.zoomTo(5);
         mMap.setMyLocationEnabled(true);
     }
 }

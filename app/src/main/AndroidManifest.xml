@@ -30,7 +30,8 @@
 
         <activity
             android:name=".UI.MainActivity"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"
+            />
 
         <meta-data
             android:name="com.google.android.gms.version"
