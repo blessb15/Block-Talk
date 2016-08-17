@@ -288,7 +288,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 int lmSize = lm.getMessages().size();
                 com.google.android.gms.maps.model.LatLng newlatlng = new com.google.android.gms.maps.model.LatLng(lm.getLatLng().latitude(), lm.getLatLng().longitude());
                 String newLoc = getLocationAddress(newlatlng.latitude, newlatlng.longitude);
-                mMap.addMarker(new MarkerOptions().position(newlatlng).title("There is " + lmSize + " message(s) at " + newLoc));
+                mMap.addMarker(new MarkerOptions()
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                        .position(newlatlng)
+                        .title("There is " + lmSize + " message(s) at " + newLoc));
             }
         }
     }
@@ -347,10 +350,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     userLocation = new LatLng(userLat, userLong);
                     mNewLocation.setHint(getLocationAddress(userLat, userLong));
                     getMessagesNearby();
-                    com.google.android.gms.maps.model.LatLng userLatLong = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
-                    CameraUpdateFactory.newLatLng(userLatLong);
-                    CameraUpdate userLocation = CameraUpdateFactory.newLatLngZoom(userLatLong, 3);
-                    mMap.animateCamera(userLocation);
                 }
             });
         }
@@ -423,7 +422,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             return;
         }
-        CameraUpdateFactory.zoomTo(5);
         mMap.setMyLocationEnabled(true);
     }
 }
