@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String username;
     private String newMessage;
     private GoogleMap mMap;
+    private int zoomToLocation = 0;
 
 
     @Override
@@ -198,6 +199,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LocationMessages locationMessages = new LocationMessages(userLocation, messages);
                     mUserMessage.setText("");
                     locationMessagesRef.push().setValue(locationMessages);
+                    com.google.android.gms.maps.model.LatLng currentLatLng = new com.google.android.gms.maps.model.LatLng(userLocation.latitude(), userLocation.longitude());
+                    CameraUpdate userLocationUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 10);
+                    mMap.animateCamera(userLocationUpdate);
                 }
                 if (locationMessagesList.size() >= 1) {
                     for (int i = 0; i < locationMessagesList.size(); i++) {
@@ -210,6 +214,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             int messagesize = (locationMessagesList.get(i).getMessages().size() - 1);
                             update.put(String.valueOf(messagesize), messageMap);
                             locationMessagesRef.child(lmKeys.get(i)).child("messages").updateChildren(update);
+                            com.google.android.gms.maps.model.LatLng currentLatLng = new com.google.android.gms.maps.model.LatLng(newLocationMessage.getLatLng().latitude(), newLocationMessage.getLatLng().longitude());
+                            CameraUpdate userLocationUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 10);
+                            mMap.animateCamera(userLocationUpdate);
                             mUserMessage.setText("");
                         }
                     }
@@ -226,6 +233,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     LocationMessages locationMessages = new LocationMessages(newLatLng, messages);
                     mUserMessage.setText("");
                     locationMessagesRef.push().setValue(locationMessages);
+                    com.google.android.gms.maps.model.LatLng currentLatLng = new com.google.android.gms.maps.model.LatLng(newLatLng.latitude(), newLatLng.longitude());
+                    CameraUpdate userLocationUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 10);
+                    mMap.animateCamera(userLocationUpdate);
                     Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
                 }
                 for (int i = 0; i < locationMessagesList.size(); i++) {
@@ -239,6 +249,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         update.put(String.valueOf(messagesize), messageMap);
                         locationMessagesRef.child(lmKeys.get(i)).child("messages").updateChildren(update);
                         mUserMessage.setText("");
+                        com.google.android.gms.maps.model.LatLng currentLatLng = new com.google.android.gms.maps.model.LatLng(newLocationMessage.getLatLng().latitude(), newLocationMessage.getLatLng().longitude());
+                        CameraUpdate userLocationUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 10);
+                        mMap.animateCamera(userLocationUpdate);
                         Toast.makeText(MainActivity.this, "Message Sent", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -350,6 +363,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     userLocation = new LatLng(userLat, userLong);
                     mNewLocation.setHint(getLocationAddress(userLat, userLong));
                     getMessagesNearby();
+                    if(zoomToLocation == 0) {
+                        com.google.android.gms.maps.model.LatLng currentLatLng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
+                        CameraUpdate userLocationUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 3);
+                        mMap.animateCamera(userLocationUpdate);
+                        zoomToLocation = 1;
+                    }
                 }
             });
         }
@@ -423,5 +442,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
         mMap.setMyLocationEnabled(true);
+        CameraUpdateFactory.zoomTo(3);
     }
 }
