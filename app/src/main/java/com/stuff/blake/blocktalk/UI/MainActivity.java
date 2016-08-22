@@ -27,8 +27,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -100,6 +102,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mNewLocation.setTypeface(font);
 
         ///MAP INSTANTIATION
+        if(zoomToLocation == 0) {
+            mNewLocation.setHint("loading...");
+        }
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -152,7 +157,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         ///FIND USER LOCATION WITH PERMISSIONS
         refreshLocation();
-
         mSubmitLocalMessage.setOnClickListener(this);
     }
 
@@ -176,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 return;
             }
-            locationManager.requestLocationUpdates(provider, 5000, 0, listener);
+            locationManager.requestLocationUpdates(provider, 1000, 0, listener);
         }
     }
 
@@ -256,6 +260,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
             }
+            InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
     }
 
@@ -286,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
                         mRecyclerView.setLayoutManager(layoutManager);
                         mRecyclerView.setHasFixedSize(true);
+                        System.out.println("YO get messages");
                     }
                 } else {
 
@@ -362,6 +369,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
                     userLocation = new LatLng(userLat, userLong);
                     mNewLocation.setHint(getLocationAddress(userLat, userLong));
+                    refreshLocation();
                     getMessagesNearby();
                     if(zoomToLocation == 0) {
                         com.google.android.gms.maps.model.LatLng currentLatLng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);

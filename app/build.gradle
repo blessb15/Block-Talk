@@ -16,8 +16,8 @@ android {
         applicationId "com.stuff.blake.blocktalk"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 20
-        versionName "1.20"
+        versionCode 21
+        versionName "1.21"
         multiDexEnabled true
     }
     packagingOptions {
