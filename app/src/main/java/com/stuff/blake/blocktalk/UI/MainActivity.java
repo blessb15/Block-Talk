@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     TextView mBlockMessage;
     @Bind(R.id.recyclerView)
     RecyclerView mRecyclerView;
+    @Bind(R.id.messageRefresh)
+    ImageButton mMessageRefesh;
     private MessageListAdapter mAdapter;
     private LocationManager locationManager;
     public static Double userLong;
@@ -85,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String newMessage;
     private GoogleMap mMap;
     private int zoomToLocation = 0;
+    private int messageCheck = 0;
 
 
     @Override
@@ -158,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ///FIND USER LOCATION WITH PERMISSIONS
         refreshLocation();
         mSubmitLocalMessage.setOnClickListener(this);
+        mMessageRefesh.setOnClickListener(this);
     }
 
     public void refreshLocation() {
@@ -185,6 +190,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void onClick(View view) {
+
+        if(view == mMessageRefesh){
+            messageCheck = 0;
+        }
 
         if (view == mSubmitLocalMessage) {
             DatabaseReference locationMessagesRef = FirebaseDatabase
@@ -368,15 +377,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void run() {
                     ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
                     userLocation = new LatLng(userLat, userLong);
-                    mNewLocation.setHint(getLocationAddress(userLat, userLong));
                     refreshLocation();
-                    getMessagesNearby();
+                    if(messageCheck == 0) {
+                        getMessagesNearby();
+                        messageCheck = 1;
+                    }
                     if(zoomToLocation == 0) {
                         com.google.android.gms.maps.model.LatLng currentLatLng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
                         CameraUpdate userLocationUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 3);
                         mMap.animateCamera(userLocationUpdate);
                         zoomToLocation = 1;
                     }
+                    mNewLocation.setHint(getLocationAddress(userLat, userLong));
                 }
             });
         }

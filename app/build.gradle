@@ -6,7 +6,7 @@ android {
         config {
             keyAlias 'block_talk'
             keyPassword 'cheesychicken'
-            storeFile file('C:/Users/Blake/Desktop/keystore/blocktalk_keystore.jks')
+            storeFile file('C:/Users/Blake/Desktop/App Stuff/keystore/blocktalk_keystore.jks')
             storePassword 'cheesychicken'
         }
     }
@@ -16,8 +16,8 @@ android {
         applicationId "com.stuff.blake.blocktalk"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 21
-        versionName "1.21"
+        versionCode 22
+        versionName "1.22"
         multiDexEnabled true
     }
     packagingOptions {
@@ -46,7 +46,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     apt 'com.jakewharton:butterknife-compiler:8.2.1'
     apt 'org.parceler:parceler:1.1.1'
