@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Bind(R.id.recyclerView)
     RecyclerView mRecyclerView;
     @Bind(R.id.messageRefresh)
-    ImageButton mMessageRefesh;
+    ImageView mMessageRefesh;
     private MessageListAdapter mAdapter;
     private LocationManager locationManager;
     public static Double userLong;

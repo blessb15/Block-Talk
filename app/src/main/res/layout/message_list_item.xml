@@ -11,7 +11,10 @@
         android:rowCount="3"
         android:columnCount="122"
         android:orientation="vertical"
-        android:translationZ="1dp">
+        android:translationZ="5dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
+        android:paddingBottom="10dp">
 
         <TextView
             android:layout_width="358dp"
@@ -23,14 +26,13 @@
             android:hint="User"
             android:layout_row="0"
             android:layout_column="0"
-            android:paddingLeft="10dp"
             android:paddingTop="7dp"
             android:paddingBottom="10dp"
             android:layout_columnSpan="121" />
 
         <TextView
-            android:layout_width="356dp"
-            android:layout_height="wrap_content"
+            android:layout_width="348dp"
+            android:layout_height="53dp"
             android:id="@+id/messageContentTextView"
             android:layout_below="@+id/messageContentTextView"
             android:layout_alignParentLeft="true"
@@ -39,9 +41,11 @@
             android:hint="SUUUUHHHH DUDE"
             android:layout_row="1"
             android:layout_column="0"
-            android:paddingTop="7dp"
-            android:paddingLeft="10dp"
-            android:layout_columnSpan="117" />
+            android:paddingTop="5dp"
+            android:layout_columnSpan="122"
+            android:text="I like a lot of cheese is good because i eat it a lot and it&apos;s good, so yeah"
+            android:paddingBottom="10dp"
+            android:paddingRight="5dp" />
 
     </GridLayout>
 
