@@ -31,7 +31,7 @@
             android:layout_columnSpan="121" />
 
         <TextView
-            android:layout_width="348dp"
+            android:layout_width="315dp"
             android:layout_height="53dp"
             android:id="@+id/messageContentTextView"
             android:layout_below="@+id/messageContentTextView"

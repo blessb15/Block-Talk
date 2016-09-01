@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onClick(View view) {
 
         if(view == mMessageRefesh){
-            messageCheck = 0;
+            getMessagesNearby();
         }
 
         if (view == mSubmitLocalMessage) {
@@ -274,8 +274,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-
-
     ///CHECKS FOR LOCATION MESSAGES AROUND WHERE YOUR SENDING TO KEEP FROM DUPLICATION
     public boolean checkForNearbyLMS(ArrayList<LocationMessages> lms, LatLng loc) {
         boolean checkforlms = false;
@@ -292,6 +290,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void getMessagesNearby() {
+        System.out.println("YO 4");
         if (locationMessagesList.size() > 0) {
             for (int i = 0; i < locationMessagesList.size(); i++) {
                 if (userLocation != null) {
@@ -330,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Geocoder coder = new Geocoder(MainActivity.this);
         List<Address> address;
 
-        List<LatLng> stuff = new ArrayList<LatLng>();
+        List<LatLng> addresses = new ArrayList<LatLng>();
         LatLng newLatLng;
 
         try {
@@ -340,11 +339,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             Address location = address.get(0);
             newLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-            stuff.add(newLatLng);
+            addresses.add(newLatLng);
         } catch (IOException e) {
             Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
         }
-        return stuff.get(0);
+        return addresses.get(0);
     }
 
     ///RETURNS STRING OF CURRENT LOCATION
@@ -354,60 +353,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String location = "Not found ";
         try {
             List<Address> address = geocoder.getFromLocation(userLat, userLong, 5);
-            Address userLocationInfo = address.get(0);
-            addressArray.add(userLocationInfo.getAddressLine(0).toString());
+            if (address.size() > 0) {
+                Address userLocationInfo = address.get(0);
+                addressArray.add(userLocationInfo.getAddressLine(0).toString());
+                location = addressArray.get(0).toString();
+            }
         } catch (IOException e) {
             Toast.makeText(MainActivity.this, "Location not found.", Toast.LENGTH_SHORT).show();
         }
-        if (addressArray.size() > 0) {
-            location = addressArray.get(0).toString();
-        }
         return location;
     }
-
-    ///LISTENING FOR CHANGE IN LOCATION, SETTING USER LOCATION.
-    private final LocationListener listener = new LocationListener() {
-        public void onLocationChanged(Location location) {
-
-            userLong = location.getLongitude();
-            userLat = location.getLatitude();
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
-                    userLocation = new LatLng(userLat, userLong);
-                    refreshLocation();
-                    if(messageCheck == 0) {
-                        getMessagesNearby();
-                        messageCheck = 1;
-                    }
-                    if(zoomToLocation == 0) {
-                        com.google.android.gms.maps.model.LatLng currentLatLng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
-                        CameraUpdate userLocationUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 3);
-                        mMap.animateCamera(userLocationUpdate);
-                        zoomToLocation = 1;
-                    }
-                    mNewLocation.setHint(getLocationAddress(userLat, userLong));
-                }
-            });
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-            userLocation = new LatLng(userLat, userLong);
-        }
-
-
-        @Override
-        public void onProviderDisabled(String s) {
-        }
-    };
 
     ///CREATES LOG OUT OPTION
     @Override
@@ -464,4 +419,48 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setMyLocationEnabled(true);
         CameraUpdateFactory.zoomTo(3);
     }
+
+    ///LISTENING FOR CHANGE IN LOCATION, SETTING USER LOCATION.
+    private final LocationListener listener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+
+            userLong = location.getLongitude();
+            userLat = location.getLatitude();
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ///REFRESHING LOCATION AND CURRENT MESSAGES VISIBLE.
+                    userLocation = new LatLng(userLat, userLong);
+                    refreshLocation();
+                    if(messageCheck == 0) {
+                        getMessagesNearby();
+                        messageCheck = 1;
+                    }
+                    if(zoomToLocation == 0) {
+                        com.google.android.gms.maps.model.LatLng currentLatLng = new com.google.android.gms.maps.model.LatLng(userLat, userLong);
+                        CameraUpdate userLocationUpdate = CameraUpdateFactory.newLatLngZoom(currentLatLng, 3);
+                        mMap.animateCamera(userLocationUpdate);
+                        zoomToLocation = 1;
+                    }
+                    mNewLocation.setHint(getLocationAddress(userLat, userLong));
+                }
+            });
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+            userLocation = new LatLng(userLat, userLong);
+        }
+
+
+        @Override
+        public void onProviderDisabled(String s) {
+        }
+    };
 }
